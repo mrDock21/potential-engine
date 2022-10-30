@@ -1,0 +1,18 @@
+set (CORE_FILES 
+	core/window.cpp 
+	core/shading/Shader.cpp 
+	core/shading/Texture.cpp 
+	core/geometry/Mesh.cpp 
+	core/geometry/vertex_buffer.cpp 
+	core/geometry/element_buffer.cpp 
+	core/shading/material.cpp 
+	core/controllers/camera.cpp 
+	core/controllers/input.cpp 
+	core/math_types/transform.cpp 
+	core/math_types/vector2.cpp 
+	core/math_types/vector3.cpp 
+	core/math_types/vector4.cpp 
+	core/math_types/matrix4.cpp 
+	core/math_types/quaternion.cpp
+)
+add_library (engine ${CORE_FILES})
