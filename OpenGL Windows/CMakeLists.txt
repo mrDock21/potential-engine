@@ -10,6 +10,7 @@ include_directories(
 	"vendor/glm/" 
 	"vendor/"
 	"engine/core/"
+	"engine/utils/"
 )
 
 # Add other files
@@ -17,7 +18,7 @@ add_subdirectory ("engine")
 
 # To compile a specific exercise: replace line 20
 add_executable (CMakeTarget 
-	"excercises/Materials/LightMaps.cpp"
+	"excercises/Lights/PointLight.cpp"
 	"vendor/glad/src/glad.c"
 )
 

@@ -14,5 +14,5 @@ set (CORE_FILES
 	core/math_types/vector4.cpp 
 	core/math_types/matrix4.cpp 
 	core/math_types/quaternion.cpp
-)
+ "utils/ShaderFile.cpp" "utils/Logger.cpp")
 add_library (engine ${CORE_FILES})
