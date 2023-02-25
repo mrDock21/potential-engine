@@ -9,10 +9,24 @@ Texture::Texture(const std::string& imgName, const TexFormat& format, const Pixe
     Init(imgName, format, pxlFormat);
 }
 
+Texture::Texture(const std::string& imgName, const ImgType& imgType) {
+    switch (imgType)
+    {
+    case ImgType::JPEG: Init(imgName, TexFormat::RGB, PixelFormat::RGB); break;
+    case ImgType::PNG: Init(imgName, TexFormat::RGBA, PixelFormat::RGBA); break;
+    default:
+        Logger::Warning("Image type for [" + imgName + "] is not yet initialized...");
+        break;
+    }
+}
+
 void Texture::Use() const {
     glBindTexture(GL_TEXTURE_2D, ID);
 }
 
+/// <summary>
+///     Will read the texture (image) file
+/// </summary>
 void Texture::Init(const std::string& imgName, const TexFormat& format, const PixelFormat& pxlFormat) {
     int numChannels;
     u_char* data;
@@ -33,6 +47,9 @@ void Texture::Init(const std::string& imgName, const TexFormat& format, const Pi
 
 }
 
+/// <summary>
+///     Creates the texture internally in OpenGL
+/// </summary>
 void Texture::GenerateTexture(const u_char* data) {
     glGenTextures(1, &ID);
     Use();

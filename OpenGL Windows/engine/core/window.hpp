@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,6 +14,7 @@
 #include "shading/Texture.hpp"
 #include "geometry/Mesh.hpp"
 #include "controllers/input.hpp"
+#include "controllers/time.hpp"
 #include "types/types.hpp"
 
 // callbacks

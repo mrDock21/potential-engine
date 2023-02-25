@@ -48,8 +48,7 @@ std::string readShader(std::string file) {
 class LightMaps : public Window {
     public:
         LightMaps(const std::string& wnd, const int& w, const int h) 
-            : Window(wnd, w, h), mainCamera(), 
-              deltaTime(0), prevTime(0) {
+            : Window(wnd, w, h), mainCamera() {
                 // init light data
                 lightData.position = Vector3(0.0f);
                 lightData.ambient = Vector3(0.5f);
@@ -88,14 +87,14 @@ class LightMaps : public Window {
             Vector3 rot(0.0f);
             // jaw
             if (Input::PressedLEFT())
-                rot.SetY(360.0f * deltaTime * sensitivity);
+                rot.SetY(360.0f * Time::deltaTime * sensitivity);
             if (Input::PressedRIGHT())
-                rot.SetY(-360.0f * deltaTime * sensitivity);
+                rot.SetY(-360.0f * Time::deltaTime * sensitivity);
             // pitch
             if (Input::PressedUP())
-                rot.SetX(360.0f * deltaTime * sensitivity);
+                rot.SetX(360.0f * Time::deltaTime * sensitivity);
             if (Input::PressedDOWN())
-                rot.SetX(-360.0f * deltaTime * sensitivity);
+                rot.SetX(-360.0f * Time::deltaTime * sensitivity);
 
             mainCamera.RotateYaw(rot.Y());
             mainCamera.RotatePitch(rot.X());
@@ -116,7 +115,7 @@ class LightMaps : public Window {
                 // move right
                 dir = mainCamera.Transform().Right();
 
-            mainCamera.Move(dir * deltaTime);
+            mainCamera.Move(dir * Time::deltaTime);
 
             if (Input::PressedESC())
                 Close();
@@ -176,10 +175,10 @@ class LightMaps : public Window {
             const u_long componentsSize = 8 * sizeof(float);
             Material material(SRC_VERTEX, SRC_FRAG);
             // since these are PNGs
-            Texture diffuseTex(DIFFUSE_MAP, Texture::TexFormat::RGBA, Texture::PixelFormat::RGBA),
-                    specularTex(SPECULAR_MAP, Texture::TexFormat::RGBA, Texture::PixelFormat::RGBA),
+            Texture diffuseTex(DIFFUSE_MAP, Texture::ImgType::PNG),
+                    specularTex(SPECULAR_MAP, Texture::ImgType::PNG),
                     // since is JPG
-                    emissionTex(EMISSION_MAP, Texture::TexFormat::RGB, Texture::PixelFormat::RGB);
+                    emissionTex(EMISSION_MAP, Texture::ImgType::JPEG);
             
             // enable ZTest buffering!
             Enable(WndBuffer::Depth);
@@ -288,10 +287,7 @@ class LightMaps : public Window {
             
             cube->Draw();
 
-            // update delta time
-            float currTime = (float)glfwGetTime();
-            deltaTime = currTime - prevTime;
-            prevTime = currTime;
+            // delta time is updated, internally, by window
         }
     
     private:
@@ -300,7 +296,6 @@ class LightMaps : public Window {
         Camera mainCamera;
         Mesh* cube;
         Mesh* lightSource;
-        float deltaTime, prevTime;
 
         const float cameraSpeed = 0.1f, sensitivity = 0.1f;
         const float LIGHT_RADIUS_ROT = 2, LIGHT_SPEED = 1, AMBIENT_FACTOR = 0.25f;
@@ -321,7 +316,7 @@ int main() {
 
     std::cout << "Current PATH => " << std::filesystem::current_path() << std::endl;
 
-    LightMaps wnd("LearnOpenGL", 800, 600);
+    LightMaps wnd("LearnOpenGL => Directional light", 800, 600);
 
     // init random seed
     srand(time(nullptr));

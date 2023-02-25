@@ -4,6 +4,8 @@
 
 #include "types/types.hpp"
 
+#include "Logger.hpp"
+
 class Texture {
     public:
         enum class TexFormat { R, RG, RGB, RGBA };
@@ -12,9 +14,13 @@ class Texture {
             R_INT, RG_INT, RGB_INT, BGR_INT, 
             RGBA_INT, BRGA_INT, STENCIL 
         };
+        enum class ImgType { JPEG, PNG };
 
         Texture();
+        // Create and read texture with specific formats
         Texture(const std::string&, const TexFormat&, const PixelFormat&);
+        // Create and read texture by specific image type
+        Texture(const std::string&, const ImgType&);
         void Use() const;
     private:
         uint ID;

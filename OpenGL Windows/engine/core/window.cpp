@@ -25,6 +25,7 @@ Window::Window(const std::string& wndName, const int& width, const int& height) 
     glfwSetErrorCallback(&OnGlfwError);
     // init glfw window
     window = glfwCreateWindow(width, height, wndName.c_str(), NULL, NULL);
+    
     if (window == nullptr) {
         glfwTerminate();
         // change this later
@@ -72,6 +73,8 @@ void Window::MainLoop() {
         glClear(wndRenderBuffer);
         
         OnRender();
+
+        Time::Update();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
