@@ -16,31 +16,15 @@ class Mesh {
         Mesh();
         Mesh(float[], const u_long&, const u_long&, uint[], const u_long&);
         Mesh(float[], const u_long&, const u_long&);
-        void SetMaterial(const Material&);
-        void SetTexture(const Texture&);
+
         void SetAttribute(const int&, const int&, const uint&, const bool&, const u_long&, const u_long&) const;
         void Use() const;
         void Render() const;
         void Draw() const;
 
-        template<class T>
-        void SetUniform(const std::string&, const T&);
-
-        const Components::Transform& Transform();
     private:
         uint VAO;
-        Components::Transform transform;
-        Material material;
-        std::vector<Texture> textures;
         VertexBuffer VBO;
         ElementBuffer EBO;
         bool usesEBO;
 };
-
-/**
- * Sets uniform in inner material
-*/
-template<class T>
-void Mesh::SetUniform(const std::string& uniform, const T& value) {
-    material.SetUniform<T>(uniform, value);
-}

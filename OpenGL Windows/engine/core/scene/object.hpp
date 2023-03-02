@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "math_types/transform.hpp"
-#include "components/chandler.hpp"
 
 /**
 * Represents an empty object in a scene

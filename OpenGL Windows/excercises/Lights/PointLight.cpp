@@ -1,11 +1,15 @@
 #include <iostream>
+#include <memory>
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
 #include <filesystem>
+#include <cstring>
 
 #include "window.hpp"
 #include "controllers/camera.hpp"
+
+#include "scene/actor.hpp"
 
 #include "ShaderFile.hpp"
 
@@ -62,25 +66,27 @@ class LightMaps : public Window {
 
         ~LightMaps() { 
             std::cout << "[Multiple-Cubes::FreesMemory]" << std::endl;
-            
-            delete cube;
-            delete lightSource;
         }
 
         void CreateLight(float* vertices, const u_long& vsize, const u_long& esize) {
-            Material s(SRC_VERTEX, SRC_FRAGMENT_LIGHT);
+            Mesh* mesh = new Mesh(vertices, vsize, esize);
+            Material* mat = new Material(SRC_VERTEX, SRC_FRAGMENT_LIGHT);
 
-            lightSource = new Mesh(vertices, vsize, esize);
-            lightSource->Use();
+            light = std::unique_ptr<Actor>( new Actor("Light", mesh, mat) );
+            
+            mesh->Use();
             // position attribute
-            lightSource->SetAttribute(0, 3, GL_FLOAT, false, esize, 0);
+            mesh->SetAttribute(0, 3, GL_FLOAT, false, esize, 0);
             // normals
-            lightSource->SetAttribute(1, 3, GL_FLOAT, false, esize, 3 * sizeof(float));
+            mesh->SetAttribute(1, 3, GL_FLOAT, false, esize, 3 * sizeof(float));
             // uv's attribute
-            lightSource->SetAttribute(2, 2, GL_FLOAT, false, esize, 6 * sizeof(float));
-                
-            s.Use();
-            lightSource->SetMaterial(s);
+            mesh->SetAttribute(2, 2, GL_FLOAT, false, esize, 6 * sizeof(float));
+            // to make sure they are binded them
+            mesh->Use();
+            mat->Use();
+
+            light->Transform().SetPosition(Vector3(1));
+            light->Transform().SetScale(0.5f);
         }
         
         void UpdateMouseLook() {
@@ -173,7 +179,8 @@ class LightMaps : public Window {
                 -0.5f, -0.5f, -1,  0, -1.0f, 0,   0.0f, 1.0f
             };
             const u_long componentsSize = 8 * sizeof(float);
-            Material material(SRC_VERTEX, SRC_FRAG);
+            Material* material = new Material(SRC_VERTEX, SRC_FRAG);
+            Mesh* mesh;
             // since these are PNGs
             Texture diffuseTex(DIFFUSE_MAP, Texture::ImgType::PNG),
                     specularTex(SPECULAR_MAP, Texture::ImgType::PNG),
@@ -183,100 +190,74 @@ class LightMaps : public Window {
             // enable ZTest buffering!
             Enable(WndBuffer::Depth);
 
-            cube = new Mesh(rect, sizeof(rect), componentsSize);
+            mesh = new Mesh(rect, sizeof(rect), componentsSize);
 
             // position attribute
-            cube->SetAttribute(0, 3, GL_FLOAT, false, componentsSize, 0);
+            mesh->SetAttribute(0, 3, GL_FLOAT, false, componentsSize, 0);
             // normals
-            cube->SetAttribute(1, 3, GL_FLOAT, false, componentsSize, 3 * sizeof(float));
+            mesh->SetAttribute(1, 3, GL_FLOAT, false, componentsSize, 3 * sizeof(float));
             // uv's attribute
-            cube->SetAttribute(2, 2, GL_FLOAT, false, componentsSize, 6 * sizeof(float));
+            mesh->SetAttribute(2, 2, GL_FLOAT, false, componentsSize, 6 * sizeof(float));
             
             // to bind with current VAO
-            cube->Use();
-            material.Use();
+            mesh->Use();
+            material->Use();
             // bind diffuse with texture set 0
             glActiveTexture(GL_TEXTURE0); 
             diffuseTex.Use();
-            material.SetUniform<int>("diffuseTexture", 0);
+            material->SetUniform<int>("diffuseTexture", 0);
             // bind diffuse with texture set 1
             glActiveTexture(GL_TEXTURE1);
             specularTex.Use();
-            material.SetUniform<int>("specularTexture", 1);
+            material->SetUniform<int>("specularTexture", 1);
             // bind diffuse with texture set 1
             glActiveTexture(GL_TEXTURE2);
             emissionTex.Use();
-            material.SetUniform<int>("emissionTexture", 2);
+            material->SetUniform<int>("emissionTexture", 2);
             
             // put here to make sure VAO's been binded
-            cube->SetTexture(diffuseTex);
-            cube->SetTexture(specularTex);
-            cube->SetTexture(emissionTex);
+            material->SetTexture(diffuseTex);
+            material->SetTexture(specularTex);
+            material->SetTexture(emissionTex);
             
-            cube->SetMaterial(material);
+            cube = std::unique_ptr<Actor>( new Actor("Cube", mesh, material) );
             
             CreateLight(rect, sizeof(rect), componentsSize);
         }
 
         void OnRenderLight(const Matrix4& view, const Matrix4& proj) {
             Matrix4 model = Matrix4::Indentity();
-            Vector3 lightPos(1);
             Vector4 lightPosViewSpace;
-            /*
-            float t = (float)glfwGetTime();
-            lightData.position.z = sin(t) * LIGHT_RADIUS_ROT;
-            lightData.position.x = cos(t) * LIGHT_RADIUS_ROT;
-            lightData.position.y = 0.0f;
-            // color
-            lightData.color.r = sin(t * 2.0f);
-            lightData.color.g = sin(t * 0.7f);
-            lightData.color.b = sin(t * 1.3f);
-            */
-            // only as white color
-            lightData.position = Vector3(1);
+
             // set white as color
             lightData.color = Vector3(1); 
             lightData.ambient = lightData.color * AMBIENT_FACTOR;
 
-            model = Matrix4::Translate(model, lightPos);
-            model = Matrix4::Scale(model, Vector3(0.2f));
-
             // send pos to cubes shader in view space (reused later in OnRender)
-            lightPosViewSpace = 
-                Matrix4::Multiply(view * model, Vector4(lightPos, 1.0f));
+            lightPosViewSpace = Matrix4::Multiply(
+                    view * light->Transform().ModelMatrix(), 
+                    Vector4(light->Transform().Position(), 1.0f)
+            );
             lightData.position = lightPosViewSpace.ToVector3();
 
-            // for light's shader            
-            lightSource->Render();
-            lightSource->SetUniform<Matrix4>("model", model);
-            lightSource->SetUniform<Matrix4>("view", view);
-            lightSource->SetUniform<Matrix4>("projection", proj);
-            lightSource->SetUniform<Vector3>("lightColor", lightData.color);
-            lightSource->Draw();
+            // for light's shader   
+            light->BeginRender(view, proj);
+            light->SetUniform<Vector3>("lightColor", lightData.color);
+            light->EndRender();
         }
 
         void OnRender() {
             // transformations
-            float angle; 
-            Matrix4 model, proj, view = mainCamera.GetViewMatrix();
+            Matrix4 proj, view = mainCamera.GetViewMatrix();
 
             proj = Matrix4::Perspective(45.0f, (float)GetAspectRatio(), 0.1f, 100.0f);
             
             OnRenderLight(view, proj);
-            
-            /*
-            //angle = glm::radians(20.0f);
-            model = glm::translate(glm::mat4(1.0f), cubeData.transform.Position());
-            model = glm::rotate(model, angle, glm::vec3(1, 0.3f, 0.5f));
-            */
-            angle = (float)glfwGetTime();
+
             cubeData.transform.SetEulerAngles(Vector3(0.0f));
-            model = cubeData.transform.ModelMatrix();
-            cube->Render();
+
+            cube->BeginRender(view, proj);
             // update uniforms
-            cube->SetUniform<Matrix4>("view", view);
-            cube->SetUniform<Matrix4>("projection", proj);
-            cube->SetUniform<Matrix4>("model", model);
             cube->SetUniform<float>("material.shininess", cubeData.shininess);
             
             cube->SetUniform<Vector3>("light.position", lightData.position);
@@ -285,17 +266,16 @@ class LightMaps : public Window {
             cube->SetUniform<Vector3>("light.specular", lightData.specular);
             cube->SetUniform<Vector3>("light.color", lightData.color);
             
-            cube->Draw();
+            cube->EndRender();
 
             // delta time is updated, internally, by window
         }
     
     private:
+        std::unique_ptr<Actor> cube, light;
         LightData lightData;
         CubeData cubeData;
         Camera mainCamera;
-        Mesh* cube;
-        Mesh* lightSource;
 
         const float cameraSpeed = 0.1f, sensitivity = 0.1f;
         const float LIGHT_RADIUS_ROT = 2, LIGHT_SPEED = 1, AMBIENT_FACTOR = 0.25f;

@@ -26,3 +26,17 @@ void Material::AddProperty(const std::string& prop) {
 void Material::SetShader(const Shader& shader) {
     this->shader = shader;
 }
+
+void Material::SetTexture(const Texture& t) {
+    textures.push_back(t);
+}
+
+void Material::Render() const {
+    Use();
+    // bind each texture-set
+    for (int i(0); i < textures.size(); i++) {
+        // first: indicate set and then bind
+        glActiveTexture(GL_TEXTURE0 + i);
+        textures.at(i).Use();
+    }
+}

@@ -1,6 +1,6 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh() : transform() { }
+Mesh::Mesh() { }
 
 /**
  * Constructs mesh with vertex buffer only
@@ -8,8 +8,7 @@ Mesh::Mesh() : transform() { }
  * @param vertsSize Size in bytes of data array
  * @param esize Size in bytes of all attributes contained in data (vertex, normal, uv...)
 */
-Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize) 
-: transform(), usesEBO(false) {
+Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize) : usesEBO(false) {
     // vertex array object
     glGenVertexArrays(1, &VAO);
     Use();
@@ -26,8 +25,13 @@ Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize)
  * @param indices Pointer to indices array
  * @param indicesSize Size in bytes of indices array
 */
-Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize, uint* indices, const u_long& indicesSize)
-    : usesEBO(true) {
+Mesh::Mesh(
+    float* verts, 
+    const u_long& vertsSize, 
+    const u_long& esize, 
+    uint* indices, 
+    const u_long& indicesSize
+) : usesEBO(true) {
     // vertex array object
     glGenVertexArrays(1, &VAO);
     Use();
@@ -38,14 +42,6 @@ Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize, uint* ind
     // element array object -> Gets binded to current VAO
     EBO = ElementBuffer(indices, indicesSize, BufferUsage::Static);
     EBO.Use();
-}
-
-void Mesh::SetMaterial(const Material& m) {
-    material = m;
-}
-
-void Mesh::SetTexture(const Texture& t) {
-    textures.push_back(t);
 }
 
 /**
@@ -79,13 +75,6 @@ void Mesh::Use() const {
 
 void Mesh::Render() const {
     Use();
-    material.Use();
-    // bind each texture-set
-    for (int i(0); i < textures.size(); i++) {
-        // first: indicate set and then bind
-        glActiveTexture(GL_TEXTURE0 + i);
-        textures.at(i).Use();
-    }
 }
 
 void Mesh::Draw() const  {
@@ -93,9 +82,4 @@ void Mesh::Draw() const  {
         glDrawElements(GL_TRIANGLES, EBO.GetArraySize(), GL_UNSIGNED_INT, 0);
     else
         glDrawArrays(GL_TRIANGLES, 0, VBO.GetArrayCount());
-}
-
-/* Doesn't have const to avoid trouble */
-const Components::Transform& Mesh::Transform() {
-    return transform;    
 }

@@ -25,7 +25,7 @@ add_executable (CMakeTarget
 # Add dynamic libs 
 target_link_directories (CMakeTarget PUBLIC vendor/glfw/lib-vc2022)
 # Add libs & engine library 
-target_link_libraries (CMakeTarget glfw3 engine)
+target_link_libraries (CMakeTarget glfw3_mt engine)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET CMakeTarget PROPERTY CXX_STANDARD 20)
