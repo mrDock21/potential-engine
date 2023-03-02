@@ -17,5 +17,11 @@ set (CORE_FILES
 	utils/ShaderFile.cpp 
 	utils/Logger.cpp
 	core/controllers/time.cpp 
-	core/scene/object.cpp)
+	core/scene/object.cpp 
+	core/components/component.cpp 
+	core/components/chandler.cpp 
+	core/types/color.cpp 
+	core/scene/light.cpp 
+	core/scene/directionallight.cpp 
+	core/scene/actor.cpp)
 add_library (engine ${CORE_FILES})

@@ -39,6 +39,7 @@ namespace Components {
         Quaternion GlobalRotation() const;
         Matrix4 ModelMatrix() const;
 
+        // Copies all transform data
         Transform& operator = (const Transform&);
     private:
         Vector3 position, scale;
