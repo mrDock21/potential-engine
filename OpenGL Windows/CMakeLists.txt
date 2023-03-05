@@ -16,11 +16,14 @@ include_directories(
 # Add other files
 add_subdirectory ("engine")
 
-# To compile a specific exercise: replace line 20
+# To compile a specific exercise: replace line 21
 add_executable (CMakeTarget 
-	"excercises/Lights/PointLight.cpp"
+	"excercises/Lights/PointLight.cpp" # Only ONE .CPP file should be here
 	"vendor/glad/src/glad.c"
 )
+# If intellisense breaks, go to Visual studio menu (to regenerate): 
+#	Proyect => Configure OpenGL Windows
+
 
 # Add dynamic libs 
 target_link_directories (CMakeTarget PUBLIC vendor/glfw/lib-vc2022)

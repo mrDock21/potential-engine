@@ -1,11 +1,23 @@
 #include "color.hpp"
 
-Color::Color() : color() { }
+Color Color::White = Color(1, 1, 1);
+Color Color::Black = Color(0, 0, 0);
+Color Color::Red = Color(1, 0, 0);
+Color Color::Green = Color(0, 1, 0);
+Color Color::Blue = Color(0, 0, 1);
+Color Color::Transparent = Color(0, 0, 0, 0);
+
+Color::Color() : color() { A(1.0f); }
 
 Color::Color(const Color& other) : color(other.color) { }
 
 Color::Color(const float& r, const float& g, const float& b) {
-	RGB(r, g, b);
+	RGB(r, g, b); A(1.0f);
+}
+
+Color::Color(const float& r, const float& g, const float& b, const float& a) 
+	: Color(r, g, b) {
+	A(a);
 }
 
 void Color::R(const float& r) {

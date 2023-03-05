@@ -53,6 +53,10 @@ void Shader::SetUniform(const std::string& uniform, const Matrix4& m) {
     SetUniform(uniform, m.matrix);
 }
 
+void Shader::SetUniform(const std::string& uniform, const Color& color) {
+    SetUniform(uniform, color.color.vec);
+}
+
 void Shader::SetUniform(const std::string& uniform, const glm::vec2& v) {
     Use();
     glUniform2f(GetUniformLocation(uniform), v.x, v.y);

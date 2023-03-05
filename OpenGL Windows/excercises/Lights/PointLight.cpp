@@ -10,6 +10,7 @@
 #include "controllers/camera.hpp"
 
 #include "scene/actor.hpp"
+#include "scene/pointlight.hpp"
 
 #include "ShaderFile.hpp"
 
@@ -19,18 +20,19 @@
 const std::string SRC_FRAGMENT_LIGHT =
     "#version 330 core\n"
     "out vec4 FragColor;\n"
-    "uniform vec3 lightColor;\n"
+    "uniform vec4 lightColor;\n"
     "void main() {\n"
-    "   FragColor = vec4(lightColor, 1.0);\n"
+    "   FragColor = lightColor;\n"
     "}\n";
 
 struct LightData {
-    Vector3 ambient, diffuse, specular;
-    Vector3 position, color;
+    Color ambient, specular;
+    std::unique_ptr<Actor> model;
+    PointLight data;
+    Vector3 viewPos;
 };
 
 struct CubeData {
-    Components::Transform transform;
     float shininess;
 };
 
@@ -49,22 +51,20 @@ std::string readShader(std::string file) {
     return s.Code();
 }
 
-class LightMaps : public Window {
+class PointLightExercise : public Window {
     public:
-        LightMaps(const std::string& wnd, const int& w, const int h) 
+        PointLightExercise(const std::string& wnd, const int& w, const int h)
             : Window(wnd, w, h), mainCamera() {
                 // init light data
-                lightData.position = Vector3(0.0f);
-                lightData.ambient = Vector3(0.5f);
-                lightData.diffuse = Vector3(1.0f);
-                lightData.specular = lightData.color = Vector3(1.0f);
+                light.ambient = Color(0.5f, 0.5f, 0.5f);
+                light.specular = Color::White;
+                light.data.K1(0.09f);
+                light.data.Kq(0.032f);
                 // init random cube's material properties
-                cubeData.transform.SetPosition(Vector3(0));
-                cubeData.transform.SetEulerAngles(Vector3(0));
                 cubeData.shininess = 128.0f;
             }
 
-        ~LightMaps() { 
+        ~PointLightExercise() {
             std::cout << "[Multiple-Cubes::FreesMemory]" << std::endl;
         }
 
@@ -72,7 +72,7 @@ class LightMaps : public Window {
             Mesh* mesh = new Mesh(vertices, vsize, esize);
             Material* mat = new Material(SRC_VERTEX, SRC_FRAGMENT_LIGHT);
 
-            light = std::unique_ptr<Actor>( new Actor("Light", mesh, mat) );
+            light.model = std::unique_ptr<Actor>( new Actor("Light", mesh, mat) );
             
             mesh->Use();
             // position attribute
@@ -85,8 +85,12 @@ class LightMaps : public Window {
             mesh->Use();
             mat->Use();
 
-            light->Transform().SetPosition(Vector3(1));
-            light->Transform().SetScale(0.5f);
+            light.model->Transform().SetPosition(Vector3(1));
+            light.model->Transform().SetScale(0.5f);
+
+            // set white as color
+            light.data.SetColor(Color::White);
+            light.ambient = Color(AMBIENT_FACTOR, AMBIENT_FACTOR, AMBIENT_FACTOR);
         }
         
         void UpdateMouseLook() {
@@ -125,6 +129,11 @@ class LightMaps : public Window {
 
             if (Input::PressedESC())
                 Close();
+
+            if (Input::PressedQ())
+                light.model->Transform().Translate(Vector3::Forward() * Time::deltaTime);
+            else if (Input::PressedE())
+                light.model->Transform().Translate(-Vector3::Forward() * Time::deltaTime);
 
             UpdateMouseLook();
         }
@@ -229,21 +238,17 @@ class LightMaps : public Window {
             Matrix4 model = Matrix4::Indentity();
             Vector4 lightPosViewSpace;
 
-            // set white as color
-            lightData.color = Vector3(1); 
-            lightData.ambient = lightData.color * AMBIENT_FACTOR;
-
             // send pos to cubes shader in view space (reused later in OnRender)
             lightPosViewSpace = Matrix4::Multiply(
-                    view * light->Transform().ModelMatrix(), 
-                    Vector4(light->Transform().Position(), 1.0f)
+                    view * light.model->Transform().ModelMatrix(), 
+                    Vector4(light.model->Transform().Position(), 1.0f)
             );
-            lightData.position = lightPosViewSpace.ToVector3();
+            light.viewPos = lightPosViewSpace.ToVector3();
 
             // for light's shader   
-            light->BeginRender(view, proj);
-            light->SetUniform<Vector3>("lightColor", lightData.color);
-            light->EndRender();
+            light.model->BeginRender(view, proj);
+            light.model->SetUniform<Color>("lightColor", light.data.GetColor());
+            light.model->EndRender();
         }
 
         void OnRender() {
@@ -254,17 +259,16 @@ class LightMaps : public Window {
             
             OnRenderLight(view, proj);
 
-            cubeData.transform.SetEulerAngles(Vector3(0.0f));
-
             cube->BeginRender(view, proj);
             // update uniforms
             cube->SetUniform<float>("material.shininess", cubeData.shininess);
             
-            cube->SetUniform<Vector3>("light.position", lightData.position);
-            cube->SetUniform<Vector3>("light.diffuse", lightData.diffuse);
-            cube->SetUniform<Vector3>("light.ambient", lightData.ambient);
-            cube->SetUniform<Vector3>("light.specular", lightData.specular);
-            cube->SetUniform<Vector3>("light.color", lightData.color);
+            cube->SetUniform<Vector3>("light.position", light.viewPos);
+            cube->SetUniform<Color>("light.ambient", light.ambient);
+            cube->SetUniform<Color>("light.specular", light.specular);
+            cube->SetUniform<Color>("light.color", light.data.GetColor());
+            cube->SetUniform<float>("light.k1", light.data.K1());
+            cube->SetUniform<float>("light.kq", light.data.Kq());
             
             cube->EndRender();
 
@@ -272,8 +276,8 @@ class LightMaps : public Window {
         }
     
     private:
-        std::unique_ptr<Actor> cube, light;
-        LightData lightData;
+        std::unique_ptr<Actor> cube;
+        LightData light;
         CubeData cubeData;
         Camera mainCamera;
 
@@ -284,7 +288,7 @@ class LightMaps : public Window {
         //  console's location which is in the "out/..." folder!!!
         // shaders...
         const std::string SRC_VERTEX = readShader(rootFolder("Shaders/VertexBasic.shader")),
-                          SRC_FRAG = readShader(rootFolder("Shaders/Lights exercise/Directional_Light.shader"));
+                          SRC_FRAG = readShader(rootFolder("Shaders/Lights exercise/Point_Light.shader"));
         // textures
         const std::string DIFFUSE_MAP = rootFolder("assets/box-container.png"),
                           SPECULAR_MAP = rootFolder("assets/box-container-specular.png"),
@@ -296,7 +300,7 @@ int main() {
 
     std::cout << "Current PATH => " << std::filesystem::current_path() << std::endl;
 
-    LightMaps wnd("LearnOpenGL => Directional light", 800, 600);
+    PointLightExercise wnd("LearnOpenGL => Point light", 800, 600);
 
     // init random seed
     srand(time(nullptr));

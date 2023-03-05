@@ -21,5 +21,5 @@ set (CORE_FILES
 	core/types/color.cpp 
 	core/scene/light.cpp 
 	core/scene/directionallight.cpp 
-	core/scene/actor.cpp)
+	core/scene/actor.cpp "core/scene/pointlight.cpp")
 add_library (engine ${CORE_FILES})

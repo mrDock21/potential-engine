@@ -6,7 +6,7 @@
 #include "types/color.hpp"
 
 class Light : public Object {
-
+public:
 	// reuse the other constructors...
 	using Object::Object;
 

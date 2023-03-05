@@ -13,6 +13,8 @@
 #include "math_types/matrix4.hpp"
 #include "types/types.hpp"
 
+#include "types/color.hpp"
+
 class Shader {
     public:
         Shader();
@@ -25,6 +27,7 @@ class Shader {
         void SetUniform(const std::string&, const Vector3&);
         void SetUniform(const std::string&, const Vector4&);
         void SetUniform(const std::string&, const Matrix4&);
+        void SetUniform(const std::string&, const Color&);
 
         void SetUniform(const std::string&, const glm::vec2&);
         void SetUniform(const std::string&, const glm::vec3&);

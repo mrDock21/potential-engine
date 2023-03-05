@@ -4,10 +4,16 @@
 
 class Color {
 public:
+	// to be able to set uniforms in shaders
+	friend class Shader;
+
+	// static premade colors
+	static Color White, Black, Red, Blue, Green, Transparent;
 
 	Color();
 	Color(const Color&);
 	Color(const float&, const float&, const float&);
+	Color(const float&, const float&, const float&, const float&);
 
 	void R(const float&);
 	void G(const float&);
