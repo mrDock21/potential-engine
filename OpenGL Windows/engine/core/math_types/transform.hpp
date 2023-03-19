@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "math_types/vector2.hpp"
 #include "math_types/vector4.hpp"
 #include "math_types/vector3.hpp"
 #include "math_types/quaternion.hpp"
@@ -17,15 +18,17 @@ namespace Components {
         Transform(const Transform&);
 
         void Translate(const Vector3&);
-        void SetPosition(const Vector3&);
-        void SetScale(const Vector3&);
-        void SetScale(const float&);
-        void SetEulerAngles(const Vector3&);
+        void Position(const Vector3&);
+        void Scale(const Vector3&);
+        void Scale(const float&);
+        void EulerAngles(const Vector3&);
         void RotateEulers(const Vector3&);
-        void SetRotation(const Quaternion&);
+        void Rotation(const Quaternion&);
         void Rotate(const Quaternion&);
         void Rotate(const float&, const Vector3&);
         void SetGlobalRotation(const Quaternion&);
+
+        void Forward(const Vector3&);
         
 
         Vector3 Position() const;

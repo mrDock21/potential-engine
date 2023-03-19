@@ -4,7 +4,7 @@ Components::Transform::Transform()
 : position(0.0f), scale(1.0f) {
     Quaternion identity = Quaternion();
     // initialize both rotations in zeros
-    SetRotation(identity);
+    Rotation(identity);
     SetGlobalRotation(identity);
 }
 
@@ -24,29 +24,29 @@ void Components::Transform::Translate(const Vector3& dir) {
 /**
  * Updates position with new given
 */
-void Components::Transform::SetPosition(const Vector3& newPos) {
+void Components::Transform::Position(const Vector3& newPos) {
     position = newPos;
 }
 
 /**
  * Updates scale with new given
 */
-void Components::Transform::SetScale(const Vector3& newScale) {
+void Components::Transform::Scale(const Vector3& newScale) {
     scale = newScale;
 }
 
 /**
  * Updates scale uniformly
 */
-void Components::Transform::SetScale(const float& s) {
+void Components::Transform::Scale(const float& s) {
     scale = s * scale;
 }
 
 /**
  * Overrides current rotation with given, in degrees
 */
-void Components::Transform::SetEulerAngles(const Vector3& eulers) {
-    SetRotation( Quaternion(eulers) );
+void Components::Transform::EulerAngles(const Vector3& eulers) {
+    Rotation( Quaternion(eulers) );
 }
 
 /**
@@ -60,7 +60,7 @@ void Components::Transform::RotateEulers(const Vector3& deltaEulers) {
 /**
  * Overrides current rotation with given
 */
-void Components::Transform::SetRotation(const Quaternion& rot) {
+void Components::Transform::Rotation(const Quaternion& rot) {
 
     rotation = rot;
     rotationMatrix = Matrix4::FromQuaternion(rotation);
@@ -96,6 +96,24 @@ void Components::Transform::SetGlobalRotation(const Quaternion& globalRot) {
     globalRotationMatrix = Matrix4::FromQuaternion(globalRotation);
 
     ComputeForwardAndRight();
+}
+
+/**
+* Rotates in
+*/
+void Components::Transform::Forward(const Vector3& dir) {
+    float angleX, angleY, angleZ;
+    Vector3 uDir = dir.Normalized();
+    Vector2 dirXZ(uDir.X(), uDir.Z()), 
+            dirZY(uDir.Z(), uDir.Y()),
+            _forward(forward.X(), forward.Z());
+
+    // all of these are in LOCAL space
+    angleY = 90 - 90 * Vector2::Dot(dirXZ, _forward); // convert dot result to degrees [0-180]
+    angleX = 90 - 90 * Vector2::Dot(dirZY, _forward);
+    // Z angle is ignored since its rotation does not affect the forward vector
+    angleZ = EulerAngles().Z();
+    EulerAngles(Vector3(angleX, angleY, angleZ));
 }
 
 /**

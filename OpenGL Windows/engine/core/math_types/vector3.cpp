@@ -25,6 +25,10 @@ float Vector3::Y() const { return vec.y; }
 
 float Vector3::Z() const { return vec.z; }
 
+Vector3 Vector3::Normalized() const {
+    return Normalize(*this);
+}
+
 const Vector3& Vector3::operator = (const Vector3& v) { 
     vec = v.vec;
     return *this;
@@ -89,4 +93,9 @@ float Vector3::Dot(const Vector3& l, const Vector3& r) {
 Vector3 Vector3::Cross(const Vector3& l, const Vector3& r) {
     glm::vec3 c = glm::cross(l.vec, r.vec);
     return Vector3(c.x, c.y, c.z);
+}
+
+Vector3 Vector3::Normalize(const Vector3& v) {
+    glm::vec3 aux = glm::normalize(v.vec);
+    return Vector3(aux.x, aux.y, aux.z);
 }

@@ -51,9 +51,9 @@ std::string readShader(std::string file) {
     return s.Code();
 }
 
-class PointLightExercise : public Window {
+class SpotLightExercise : public Window {
     public:
-        PointLightExercise(const std::string& wnd, const int& w, const int h)
+        SpotLightExercise(const std::string& wnd, const int& w, const int h)
             : Window(wnd, w, h), mainCamera() {
                 // init light data
                 light.ambient = Color(0.5f, 0.5f, 0.5f);
@@ -64,8 +64,8 @@ class PointLightExercise : public Window {
                 cubeData.shininess = 128.0f;
             }
 
-        ~PointLightExercise() {
-            std::cout << "[Multiple-Cubes => FreesMemory]" << std::endl;
+        ~SpotLightExercise() {
+            std::cout << "[Multiple-Cubes::FreesMemory]" << std::endl;
         }
 
         void CreateLight(float* vertices, const u_long& vsize, const u_long& esize) {
@@ -85,8 +85,8 @@ class PointLightExercise : public Window {
             mesh->Use();
             mat->Use();
 
-            light.model->Transform().SetPosition(Vector3(1));
-            light.model->Transform().SetScale(0.5f);
+            light.model->Transform().Position(Vector3(1));
+            light.model->Transform().Scale(0.5f);
 
             // set white as color
             light.data.SetColor(Color::White);
@@ -300,7 +300,7 @@ int main() {
 
     std::cout << "Current PATH => " << std::filesystem::current_path() << std::endl;
 
-    PointLightExercise wnd("LearnOpenGL => Point light", 800, 600);
+    SpotLightExercise wnd("LearnOpenGL => Point light", 800, 600);
 
     // init random seed
     srand(time(nullptr));

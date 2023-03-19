@@ -27,6 +27,8 @@ class Vector3 {
         float Y() const;
         float Z() const;
 
+        Vector3 Normalized() const;
+
         const Vector3& operator = (const Vector3&);
         const Vector3& operator += (const Vector3&);
         friend Vector3 operator + (Vector3, const Vector3&);
@@ -42,6 +44,7 @@ class Vector3 {
         static Vector3 Forward();
         static float Dot(const Vector3&, const Vector3&);
         static Vector3 Cross(const Vector3&, const Vector3&);
+        static Vector3 Normalize(const Vector3&);
     private:
         glm::vec3 vec;
 

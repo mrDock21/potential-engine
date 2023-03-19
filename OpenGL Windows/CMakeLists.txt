@@ -18,9 +18,8 @@ add_subdirectory ("engine")
 
 # To compile a specific exercise: replace line 21
 add_executable (CMakeTarget 
-	"excercises/Lights/PointLight.cpp" # Only ONE .CPP file should be here
-	"vendor/glad/src/glad.c"
-)
+	"excercises/Lights/SpotLight.cpp" # Only ONE .CPP file should be here
+	"vendor/glad/src/glad.c")
 # If intellisense breaks, go to Visual studio menu (to regenerate): 
 #	Proyect => Configure OpenGL Windows
 

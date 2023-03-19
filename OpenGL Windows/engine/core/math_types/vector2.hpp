@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 /**
  * Represents a two component vector (X, Y)
 */
@@ -15,6 +17,8 @@ class Vector2 {
         float X() const;
         float Y() const;
 
+        Vector2 Normalized() const;
+
         const Vector2& operator = (const Vector2&);
         const Vector2& operator + (const Vector2&);
         const Vector2& operator - (const Vector2&);
@@ -22,6 +26,8 @@ class Vector2 {
         const Vector2& operator / (const float&);
 
         static float Dot(const Vector2&, const Vector2&);
+        inline static float Magnitude(const Vector2&);
+        static Vector2 Normalize(const Vector2&);
     private:
-        float x, y;
+        glm::vec2 vec;
 };
