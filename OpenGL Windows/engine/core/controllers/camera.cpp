@@ -14,7 +14,7 @@ Camera::Camera()
  * @param initialPos Initial position
 */
 Camera::Camera(const Vector3& initialPos) : Camera() { 
-    transform.SetPosition(initialPos);
+    transform.Position(initialPos);
 }
 
 void Camera::Move(const Vector3& dir) {
@@ -33,7 +33,7 @@ void Camera::RotatePitch(const float& angleX) {
     forward = transform.Forward();
 
     if (forward.Y() > 0.95f || forward.Y() < -0.95f)
-        transform.SetRotation(oldRot);
+        transform.Rotation(oldRot);
 }
 
 /**

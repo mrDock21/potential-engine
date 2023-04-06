@@ -8,9 +8,11 @@ include_directories(
 	"vendor/glad/include/" 
 	"vendor/glfw/include/" 
 	"vendor/glm/" 
-	"vendor/"
-	"engine/core/"
-	"engine/utils/"
+	"vendor/imgui/" 
+	"vendor/imgui/backend/" 
+	"vendor/" 
+	"engine/core/" 
+	"engine/utils/" 
 )
 
 # Add other files
@@ -18,8 +20,18 @@ add_subdirectory ("engine")
 
 # To compile a specific exercise: replace line 21
 add_executable (CMakeTarget 
-	"excercises/Lights/SpotLight.cpp" # Only ONE .CPP file should be here
-	"vendor/glad/src/glad.c")
+	"excercises/Lights/SpotLight.cpp" # Only ONE exercise.CPP file should be here
+
+	#vendor files
+	"vendor/glad/src/glad.c"
+	"vendor/imgui/imgui.cpp"
+	"vendor/imgui/imgui_draw.cpp"
+	"vendor/imgui/imgui_tables.cpp"
+	"vendor/imgui/imgui_widgets.cpp"
+	"vendor/imgui/backend/imgui_impl_glfw.cpp"
+	"vendor/imgui/backend/imgui_impl_opengl3.cpp"
+	"vendor/imgui/backend/imgui_stdlib.cpp"
+)
 # If intellisense breaks, go to Visual studio menu (to regenerate): 
 #	Proyect => Configure OpenGL Windows
 

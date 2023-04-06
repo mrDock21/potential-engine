@@ -11,14 +11,14 @@ Object::Object(const std::string& name) : Name(name), transform() {
 Object::Object(const std::string& name, const Vector3& pos) : 
 	Name(name), transform() {
 
-	transform.SetPosition(pos);
+	transform.Position(pos);
 }
 
 Object::Object(const std::string& name, const Vector3& pos, const Vector3& rot) 
 	: Name(name), transform() {
 
-	transform.SetPosition(pos);
-	transform.SetEulerAngles(rot);
+	transform.Position(pos);
+	transform.EulerAngles(rot);
 }
 
 Object::Object(
@@ -28,9 +28,9 @@ Object::Object(
 	const Vector3& scale 
 ) : Name(name), transform() {
 
-	transform.SetPosition(pos);
-	transform.SetEulerAngles(rot);
-	transform.SetScale(scale);
+	transform.Position(pos);
+	transform.EulerAngles(rot);
+	transform.Scale(scale);
 }
 
 Components::Transform& Object::Transform() {

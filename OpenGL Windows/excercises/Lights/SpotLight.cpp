@@ -10,26 +10,17 @@
 #include "controllers/camera.hpp"
 
 #include "scene/actor.hpp"
-#include "scene/pointlight.hpp"
+#include "scene/spotlight.hpp"
 
 #include "ShaderFile.hpp"
 
 /**
  * Compile this with cmake (in root folder)
 */
-const std::string SRC_FRAGMENT_LIGHT =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 lightColor;\n"
-    "void main() {\n"
-    "   FragColor = lightColor;\n"
-    "}\n";
-
 struct LightData {
     Color ambient, specular;
-    std::unique_ptr<Actor> model;
-    PointLight data;
-    Vector3 viewPos;
+    SpotLight data;
+    Vector3 viewPos, forward;
 };
 
 struct CubeData {
@@ -58,8 +49,9 @@ class SpotLightExercise : public Window {
                 // init light data
                 light.ambient = Color(0.5f, 0.5f, 0.5f);
                 light.specular = Color::White;
-                light.data.K1(0.09f);
-                light.data.Kq(0.032f);
+                //light.data.K1(0.09f);
+                //light.data.Kq(0.032f);
+                light.data.SpotAngle(glm::cos(glm::radians(12.5f)));
                 // init random cube's material properties
                 cubeData.shininess = 128.0f;
             }
@@ -68,26 +60,9 @@ class SpotLightExercise : public Window {
             std::cout << "[Multiple-Cubes::FreesMemory]" << std::endl;
         }
 
-        void CreateLight(float* vertices, const u_long& vsize, const u_long& esize) {
-            Mesh* mesh = new Mesh(vertices, vsize, esize);
-            Material* mat = new Material(SRC_VERTEX, SRC_FRAGMENT_LIGHT);
-
-            light.model = std::unique_ptr<Actor>( new Actor("Light", mesh, mat) );
-            
-            mesh->Use();
-            // position attribute
-            mesh->SetAttribute(0, 3, GL_FLOAT, false, esize, 0);
-            // normals
-            mesh->SetAttribute(1, 3, GL_FLOAT, false, esize, 3 * sizeof(float));
-            // uv's attribute
-            mesh->SetAttribute(2, 2, GL_FLOAT, false, esize, 6 * sizeof(float));
-            // to make sure they are binded them
-            mesh->Use();
-            mat->Use();
-
-            light.model->Transform().Position(Vector3(1));
-            light.model->Transform().Scale(0.5f);
-
+        void CreateLight() {
+            // there is no mesh for the light now
+            light.data.Name = "Name";;
             // set white as color
             light.data.SetColor(Color::White);
             light.ambient = Color(AMBIENT_FACTOR, AMBIENT_FACTOR, AMBIENT_FACTOR);
@@ -130,12 +105,44 @@ class SpotLightExercise : public Window {
             if (Input::PressedESC())
                 Close();
 
-            if (Input::PressedQ())
-                light.model->Transform().Translate(Vector3::Forward() * Time::deltaTime);
-            else if (Input::PressedE())
-                light.model->Transform().Translate(-Vector3::Forward() * Time::deltaTime);
-
             UpdateMouseLook();
+        }
+
+        void HandleUI() {
+            
+            static float f = 0.0f;
+            static bool show_demo_window = true,
+                        show_another_window = false;
+            static int counter = 0;
+            static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+            ImGui::Checkbox("Another Window", &show_another_window);
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / Framerate(), Framerate());
+            ImGui::End();
+
+            // 3. Show another simple window.
+            if (show_another_window)
+            {
+                ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+                ImGui::Text("Hello from another window!");
+                if (ImGui::Button("Close Me"))
+                    show_another_window = false;
+                ImGui::End();
+            }
+            
         }
 
         /**
@@ -231,24 +238,31 @@ class SpotLightExercise : public Window {
             
             cube = std::unique_ptr<Actor>( new Actor("Cube", mesh, material) );
             
-            CreateLight(rect, sizeof(rect), componentsSize);
+            CreateLight();
         }
 
         void OnRenderLight(const Matrix4& view, const Matrix4& proj) {
-            Matrix4 model = Matrix4::Indentity();
-            Vector4 lightPosViewSpace;
+            Vector4 lightPosViewSpace, forward;
+            const Components::Transform& camT = mainCamera.Transform();
+
+            // stick the light to the camera
+            light.data.Transform().Position(camT.Position());
+            light.data.Transform().Rotation(camT.Rotation());
+            forward = Vector4(camT.Forward(), 0.0f);
 
             // send pos to cubes shader in view space (reused later in OnRender)
             lightPosViewSpace = Matrix4::Multiply(
-                    view * light.model->Transform().ModelMatrix(), 
-                    Vector4(light.model->Transform().Position(), 1.0f)
+                    view * camT.ModelMatrix(), 
+                    Vector4(camT.Position(), 1.0f)
+            );
+            
+            // send "forward" to cubes shader in view space (reused later in OnRender)
+            forward = Matrix4::Multiply(
+                    view * camT.ModelMatrix(), 
+                    forward
             );
             light.viewPos = lightPosViewSpace.ToVector3();
-
-            // for light's shader   
-            light.model->BeginRender(view, proj);
-            light.model->SetUniform<Color>("lightColor", light.data.GetColor());
-            light.model->EndRender();
+            light.forward = forward.ToVector3();
         }
 
         void OnRender() {
@@ -267,8 +281,10 @@ class SpotLightExercise : public Window {
             cube->SetUniform<Color>("light.ambient", light.ambient);
             cube->SetUniform<Color>("light.specular", light.specular);
             cube->SetUniform<Color>("light.color", light.data.GetColor());
-            cube->SetUniform<float>("light.k1", light.data.K1());
-            cube->SetUniform<float>("light.kq", light.data.Kq());
+            //cube->SetUniform<float>("light.k1", light.data.K1());
+            //cube->SetUniform<float>("light.kq", light.data.Kq());
+            cube->SetUniform<float>("light.maxAngle", light.data.SpotAngle());
+            cube->SetUniform<Vector3>("light.forward", -Vector3::Forward());// light.forward);
             
             cube->EndRender();
 
@@ -288,7 +304,7 @@ class SpotLightExercise : public Window {
         //  console's location which is in the "out/..." folder!!!
         // shaders...
         const std::string SRC_VERTEX = readShader(rootFolder("Shaders/VertexBasic.shader")),
-                          SRC_FRAG = readShader(rootFolder("Shaders/Lights exercise/Point_Light.shader"));
+                          SRC_FRAG = readShader(rootFolder("Shaders/Lights exercise/Spot_Light.shader"));
         // textures
         const std::string DIFFUSE_MAP = rootFolder("assets/box-container.png"),
                           SPECULAR_MAP = rootFolder("assets/box-container-specular.png"),
@@ -300,7 +316,7 @@ int main() {
 
     std::cout << "Current PATH => " << std::filesystem::current_path() << std::endl;
 
-    SpotLightExercise wnd("LearnOpenGL => Point light", 800, 600);
+    SpotLightExercise wnd("LearnOpenGL => Spot light", 800, 600);
 
     // init random seed
     srand(time(nullptr));

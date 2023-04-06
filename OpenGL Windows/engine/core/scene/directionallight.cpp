@@ -2,7 +2,7 @@
 
 DirectionalLight::DirectionalLight(const Vector3& pos, const Vector3& dir) {
 	
-	Transform().SetPosition(pos);
+	Transform().Position(pos);
 	Dir(dir);
 }
 
