@@ -1,6 +1,6 @@
 #include "material.hpp"
 
-Material::Material() { }
+Material::Material() : linkedToScene(false) { }
 
 /**
  * Initializes material with given shader src
@@ -8,23 +8,23 @@ Material::Material() { }
  * @param fragSrc Source code of fragment shader
 */
 Material::Material(const std::string& vertexSrc, const std::string& fragSrc) 
-    : shader(vertexSrc, fragSrc) { }
+    : shader(vertexSrc, fragSrc), linkedToScene(false) { }
 
 void Material::Use() const {
     shader.Use();
 }
 
-void Material::DefineProperties(std::string* arr, int count) {
-    for (int i(0); i < count; i++)
-        AddProperty(arr[i]);
-}
-
-void Material::AddProperty(const std::string& prop) {
-    properties.push_back(prop);
-}
-
 void Material::SetShader(const Shader& shader) {
     this->shader = shader;
+}
+
+void Material::SetUniformBlock(const UBO& ubo) {
+
+    if (linkedToScene)
+        return;
+
+    shader.SetUniformBlock(ubo.UniformBlockName(), ubo.BindingIndex());
+    linkedToScene = true;
 }
 
 void Material::SetTexture(const Texture& t) {
@@ -39,4 +39,32 @@ void Material::Render() const {
         glActiveTexture(GL_TEXTURE0 + i);
         textures.at(i).Use();
     }
+}
+
+void Material::SetUniform(const std::string& name, const int& value) {
+    shader.SetUniform(name, value);
+}
+
+void Material::SetUniform(const std::string& name, const float& value) {
+    shader.SetUniform(name, value);
+}
+
+void Material::SetUniform(const std::string& name, const Vector3& value) {
+    shader.SetUniform(name, value);
+}
+
+void Material::SetUniform(const std::string& name, const Vector4& value) {
+    shader.SetUniform(name, value);
+}
+
+void Material::SetUniform(const std::string& name, const Matrix4& value) {
+    shader.SetUniform(name, value);
+}
+
+void Material::SetUniform(const std::string& name, const Color& value) {
+    shader.SetUniform(name, value);
+}
+
+inline bool Material::LinkedToScene() const {
+    return linkedToScene;
 }

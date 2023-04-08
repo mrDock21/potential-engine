@@ -14,6 +14,8 @@
 
 #include "ShaderFile.hpp"
 
+#include "scene/scene.hpp"
+
 /**
  * Compile this with cmake (in root folder)
 */
@@ -49,8 +51,6 @@ class SpotLightExercise : public Window {
                 // init light data
                 light.ambient = Color(0.5f, 0.5f, 0.5f);
                 light.specular = Color::White;
-                //light.data.K1(0.09f);
-                //light.data.Kq(0.032f);
                 light.data.SpotAngle(glm::cos(glm::radians(12.5f)));
                 // init random cube's material properties
                 cubeData.shininess = 128.0f;
@@ -117,6 +117,7 @@ class SpotLightExercise : public Window {
             static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
             ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
 
             ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
@@ -221,23 +222,30 @@ class SpotLightExercise : public Window {
             // bind diffuse with texture set 0
             glActiveTexture(GL_TEXTURE0); 
             diffuseTex.Use();
-            material->SetUniform<int>("diffuseTexture", 0);
+            material->SetUniform("diffuseTexture", 0);
             // bind diffuse with texture set 1
             glActiveTexture(GL_TEXTURE1);
             specularTex.Use();
-            material->SetUniform<int>("specularTexture", 1);
+            material->SetUniform("specularTexture", 1);
             // bind diffuse with texture set 1
             glActiveTexture(GL_TEXTURE2);
             emissionTex.Use();
-            material->SetUniform<int>("emissionTexture", 2);
+            material->SetUniform("emissionTexture", 2);
             
             // put here to make sure VAO's been binded
             material->SetTexture(diffuseTex);
             material->SetTexture(specularTex);
             material->SetTexture(emissionTex);
             
-            cube = std::unique_ptr<Actor>( new Actor("Cube", mesh, material) );
-            
+            Logger::Log("Initializes the data =>");
+
+            mainScene.InitializeGlobalData(
+                UNIFORM_BLOCK_NAME, 
+                UNIFORM_BLOCK_INDEX,
+                Matrix4::Size() * 2 // since there are two matrices (view, proj)
+            );
+            cube = std::make_shared<Actor>( "Cube", mesh, material );
+            mainScene.AddActor( cube );
             CreateLight();
         }
 
@@ -273,18 +281,20 @@ class SpotLightExercise : public Window {
             
             OnRenderLight(view, proj);
 
-            cube->BeginRender(view, proj);
+            mainScene.Render(view, proj);
+
+            cube->BeginRender();
             // update uniforms
-            cube->SetUniform<float>("material.shininess", cubeData.shininess);
+            cube->material()->SetUniform("material.shininess", cubeData.shininess);
             
-            cube->SetUniform<Vector3>("light.position", light.viewPos);
-            cube->SetUniform<Color>("light.ambient", light.ambient);
-            cube->SetUniform<Color>("light.specular", light.specular);
-            cube->SetUniform<Color>("light.color", light.data.GetColor());
+            cube->material()->SetUniform("light.position", light.viewPos);
+            cube->material()->SetUniform("light.ambient", light.ambient);
+            cube->material()->SetUniform("light.specular", light.specular);
+            cube->material()->SetUniform("light.color", light.data.GetColor());
             //cube->SetUniform<float>("light.k1", light.data.K1());
             //cube->SetUniform<float>("light.kq", light.data.Kq());
-            cube->SetUniform<float>("light.maxAngle", light.data.SpotAngle());
-            cube->SetUniform<Vector3>("light.forward", -Vector3::Forward());// light.forward);
+            cube->material()->SetUniform("light.maxAngle", light.data.SpotAngle());
+            cube->material()->SetUniform("light.forward", -Vector3::Forward());// light.forward);
             
             cube->EndRender();
 
@@ -292,7 +302,8 @@ class SpotLightExercise : public Window {
         }
     
     private:
-        std::unique_ptr<Actor> cube;
+        std::shared_ptr<Actor> cube;
+        Scene mainScene;
         LightData light;
         CubeData cubeData;
         Camera mainCamera;
@@ -309,6 +320,9 @@ class SpotLightExercise : public Window {
         const std::string DIFFUSE_MAP = rootFolder("assets/box-container.png"),
                           SPECULAR_MAP = rootFolder("assets/box-container-specular.png"),
                           EMISSION_MAP = rootFolder("assets/matrix_emission.jpg");
+
+        const std::string UNIFORM_BLOCK_NAME = "GlobalMatrices";
+        const int UNIFORM_BLOCK_INDEX = 0;
 };
 
 

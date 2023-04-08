@@ -26,31 +26,23 @@ public:
 	/// </summary>
 	/// <param name="">	View matrix			</param>
 	/// <param name="">	Projection matrix	</param>
-	void Render(const Matrix4&, const Matrix4&);
+	void Render();
 	/// <summary>
 	///		Binds OpenGL object (gives room to set shader properties).
 	///		Must call EndRender()
 	/// </summary>
 	/// <param name=""> View matrix			</param>
 	/// <param name="">	Projection matrix	</param>
-	void BeginRender(const Matrix4&, const Matrix4&);
+	void BeginRender();
 	/// <summary>
 	///		Ends render and draws the object to the screen
 	/// </summary>
 	void EndRender();
 
-	template<class T>
-	void SetUniform(const std::string&, const T&);
+	Material* material() const;
 
 private:
 	std::unique_ptr<Mesh> mesh;
-	std::unique_ptr<Material> material;
+	std::unique_ptr<Material> materialPtr;
 };
 
-/**
- * Sets uniform in inner material
-*/
-template<class T>
-void Actor::SetUniform(const std::string& uniform, const T& value) {
-	material->SetUniform<T>(uniform, value);
-}

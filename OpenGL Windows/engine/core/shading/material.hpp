@@ -2,9 +2,14 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 #include "shading/Shader.hpp"
 #include "shading/Texture.hpp"
+
+#include "material_property_types.hpp"
+
+#include "uniform_buffer.hpp"
 
 class Material {
     public:
@@ -12,25 +17,23 @@ class Material {
         Material(const std::string&, const std::string&);
         void Use() const;
         void Render() const;
-        void DefineProperties(std::string[], int);
-        void AddProperty(const std::string&);
+
         void SetShader(const Shader&);
+        void SetUniformBlock(const UBO&);
 
         void SetTexture(const Texture&);
+        void SetUniform(const std::string&, const int&);
+        void SetUniform(const std::string&, const float&);
+        void SetUniform(const std::string&, const Vector3&);
+        void SetUniform(const std::string&, const Vector4&);
+        void SetUniform(const std::string&, const Matrix4&);
+        void SetUniform(const std::string&, const Color&);
 
-        template<class T>
-        void SetUniform(const std::string&, const T&);
+        inline bool LinkedToScene() const;
+
     private:
         Shader shader;
-        std::vector<std::string> properties;
         std::vector<Texture> textures; // each may have different textures...
-};
 
-/**
- * Sets inner shader's uniform with its given name and value
-*/
-template<class T>
-void Material::SetUniform(const std::string& propName, const T& value) {
-    // shader should overload method with T to avoid errors
-    shader.SetUniform(propName, value);
-}
+        bool linkedToScene;
+};

@@ -28,6 +28,11 @@ void Shader::Use() const {
     glUseProgram(_ProgramID);
 }
 
+void Shader::SetUniformBlock(const std::string& blockName, const uint& bindingIndex) {
+    uint uniformBlock = glGetUniformBlockIndex(_ProgramID, blockName.c_str());
+    glUniformBlockBinding(_ProgramID, uniformBlock, bindingIndex);
+}
+
 void Shader::SetUniform(const std::string& uniform, const float& value) {
     Use();
     glUniform1f(GetUniformLocation(uniform), value);

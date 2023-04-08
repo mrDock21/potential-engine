@@ -21,6 +21,8 @@ class Shader {
         Shader(const std::string&, const std::string&);
         void Use() const;
 
+        void SetUniformBlock(const std::string&, const uint&);
+
         void SetUniform(const std::string&, const float&);
         void SetUniform(const std::string&, const int&);
 

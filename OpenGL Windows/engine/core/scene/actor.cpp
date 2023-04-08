@@ -4,13 +4,13 @@ Actor::Actor() : Object() { }
 
 
 Actor::Actor(Mesh* meshPtr, Material* matPtr) 
-	: Object(), mesh(meshPtr), material(matPtr) {
+	: Object(), mesh(meshPtr), materialPtr(matPtr) {
 }
 
 Actor::Actor(const std::string& name) : Object(name) { }
 
 Actor::Actor(const std::string& name, Mesh* meshPtr, Material* matPtr) 
-	: Object(name), mesh(meshPtr), material(matPtr) {
+	: Object(name), mesh(meshPtr), materialPtr(matPtr) {
 	
 }
 
@@ -22,24 +22,26 @@ void Actor::SetMaterial(Material* m) {
 	// rebing VAO with new material
 }
 
-void Actor::Render(const Matrix4& view, const Matrix4& proj) {
+void Actor::Render() {
 	// draw the entire object at once
-	BeginRender(view, proj);
+	BeginRender();
 	EndRender();
 }
 
-void Actor::BeginRender(const Matrix4& view, const Matrix4& proj) {
+void Actor::BeginRender() {
 	// binds VAO
 	mesh->Render();
 	// binds shaders & textures
-	material->Render();
+	materialPtr->Render();
 
 	// set base uniforms
-	material->SetUniform<Matrix4>("view", view);
-	material->SetUniform<Matrix4>("projection", proj);
-	material->SetUniform<Matrix4>("model", Transform().ModelMatrix());
+	materialPtr->SetUniform("model", Transform().ModelMatrix());
 }
 
 void Actor::EndRender() {
 	mesh->Draw();
+}
+
+Material* Actor::material() const {
+	return materialPtr.get();
 }

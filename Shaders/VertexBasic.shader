@@ -10,8 +10,12 @@ out vec3 normal;
 out vec4 fragPos;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+
+// uniform block for common matrices
+layout(std140) uniform GlobalMatrices {
+	mat4 view;
+	mat4 projection;
+};
 
 void main() {
 	// send output to fragment shader in view space

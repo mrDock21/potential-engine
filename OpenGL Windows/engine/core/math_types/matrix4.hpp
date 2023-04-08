@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "math_types/vector3.hpp"
 #include "math_types/vector4.hpp"
@@ -17,6 +18,9 @@ class Matrix4 {
     public:
         Matrix4();
         Matrix4(const Matrix4&);
+
+        inline const float* ValuePtr() const { return glm::value_ptr(matrix); }
+        inline static unsigned long long Size() { return sizeof(glm::mat4); }
 
         const Matrix4& operator = (const Matrix4&);
         const Matrix4& operator *= (const Matrix4&);
