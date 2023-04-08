@@ -9,6 +9,7 @@ set (CORE_FILES
 	core/shading/material.cpp 
 	core/controllers/camera.cpp 
 	core/controllers/input.cpp 
+	core/controllers/window_context.cpp
 	core/math_types/transform.cpp 
 	core/math_types/vector2.cpp 
 	core/math_types/vector3.cpp 

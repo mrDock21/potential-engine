@@ -3,6 +3,7 @@
 // global callbacks
 void OnResize(GLFWwindow* window, int w, int h) {
     glViewport(0, 0, w, h);
+    WindowContext::OnWindowResized(w, h);
 }
 
 void OnGlfwError(int id, const char* error) {
@@ -42,11 +43,16 @@ Window::Window(const std::string& wndName, const int& width, const int& height) 
     InitGlad();
 
     Input::Focus(window);
+    // couldn't think of something better...
+    WindowContext::OnResize([this](const int& w, const int& h) {
+        this->Resize(w, h);
+    });
 }
 
 void Window::InitGlad() const {
 
     glfwSetWindowSizeCallback(window, OnResize);
+    //glfwSetFramebufferSizeCallback(window, OnFrameResize);
     
     std::cout << "Window created! :D" << std::endl;
 
@@ -136,6 +142,11 @@ void Window::MainLoop() {
     ImGui::DestroyContext();
 
     glfwTerminate();
+}
+
+void Window::Resize(const int& w, const int& h) {
+    width = w;
+    height = h;
 }
 
 /**

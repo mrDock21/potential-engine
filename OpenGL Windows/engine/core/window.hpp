@@ -21,7 +21,9 @@
 #include "controllers/time.hpp"
 #include "types/types.hpp"
 
-// callbacks
+#include "controllers/window_context.hpp"
+
+// global callbacks for GLFW
 void OnResize(GLFWwindow*, int, int);
 void OnGlfwError(int, const char*);
 
@@ -37,6 +39,8 @@ class Window {
 
         void MainLoop();
         void Close() const;
+
+        void Resize(const int&, const int&);
 
         void Enable(const WndBuffer&);
         void Disable(const WndBuffer&);
