@@ -5,26 +5,29 @@
 
 #include "math_types/vector3.hpp"
 
-class Quaternion {
+namespace CEngine {
 
-    // Matrix4 may now have access private things
-    friend class Matrix4;
+    class Quaternion {
 
-    public:
-        Quaternion();
-        Quaternion(const Vector3&);
+        // Matrix4 may now have access private things
+        friend class Matrix4;
 
-        void SetEulerAngles(const Vector3&);
-        Vector3 EulerAngles() const;
+        public:
+            Quaternion();
+            Quaternion(const Vector3&);
 
-        const Quaternion& operator = (const Quaternion&);
-        const Quaternion& operator *= (const Quaternion&);
-        friend Quaternion operator * (Quaternion, const Quaternion&);
+            void SetEulerAngles(const Vector3&);
+            Vector3 EulerAngles() const;
 
-        static Quaternion AngleAxis(const float&, const Vector3&);
+            const Quaternion& operator = (const Quaternion&);
+            const Quaternion& operator *= (const Quaternion&);
+            friend Quaternion operator * (Quaternion, const Quaternion&);
 
-    private:
-        glm::quat quaternion;
+            static Quaternion AngleAxis(const float&, const Vector3&);
 
-        Quaternion(const glm::quat&);
-};
+        private:
+            glm::quat quaternion;
+
+            Quaternion(const glm::quat&);
+    };
+}

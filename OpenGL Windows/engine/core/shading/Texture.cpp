@@ -3,6 +3,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "./../../../vendor/stb_image.h"
 
+using namespace CEngine;
+
 Texture::Texture() { }
 
 Texture::Texture(const std::string& imgName, const TexFormat& format, const PixelFormat& pxlFormat) {

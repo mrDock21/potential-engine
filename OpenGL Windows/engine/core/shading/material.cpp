@@ -1,5 +1,7 @@
 #include "material.hpp"
 
+using namespace CEngine;
+
 Material::Material() : linkedToScene(false) { }
 
 /**

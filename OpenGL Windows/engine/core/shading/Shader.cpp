@@ -1,5 +1,7 @@
 #include "Shader.hpp"
 
+using namespace CEngine;
+
 Shader::Shader() : _ProgramID(0) { }
 
 Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc) {

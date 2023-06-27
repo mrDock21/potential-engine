@@ -2,19 +2,22 @@
 
 #include "light.hpp"
 
-class SpotLight : public Light {
-public:
+namespace CEngine {
 
-	using Light::Light;
+	class SpotLight : public Light {
+	public:
 
-	SpotLight();
-	SpotLight(const float&);
+		using Light::Light;
 
-	void Forward(const Vector3&);
-	void SpotAngle(const float&);
+		SpotLight();
+		SpotLight(const float&);
 
-	float SpotAngle() const;
+		void Forward(const Vector3&);
+		void SpotAngle(const float&);
 
-private:
-	float spotAngle;
-};
+		float SpotAngle() const;
+
+	private:
+		float spotAngle;
+	};
+}

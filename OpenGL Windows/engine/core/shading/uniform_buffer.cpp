@@ -1,5 +1,7 @@
 #include "uniform_buffer.hpp"
 
+using namespace CEngine;
+
 UBO::UBO (
 	const std::string& name, 
 	const uint& bindingPoint, 

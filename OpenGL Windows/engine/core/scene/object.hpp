@@ -5,21 +5,24 @@
 
 #include "math_types/transform.hpp"
 
-/**
-* Represents an empty object in a scene
-*/
-class Object {
-public:
-	std::string Name;
+namespace CEngine {
 
-	Object();
-	Object(const std::string&);
-	Object(const std::string&, const Vector3&);
-	Object(const std::string&, const Vector3&, const Vector3&);
-	Object(const std::string&, const Vector3&, const Vector3&, const Vector3&);
+	/**
+	* Represents an empty object in a scene
+	*/
+	class Object {
+	public:
+		std::string Name;
 
-	Components::Transform& Transform();
+		Object();
+		Object(const std::string&);
+		Object(const std::string&, const Vector3&);
+		Object(const std::string&, const Vector3&, const Vector3&);
+		Object(const std::string&, const Vector3&, const Vector3&, const Vector3&);
 
-private:
-	Components::Transform transform;
-};
+		CEngine::Transform& Transform();
+
+	private:
+		CEngine::Transform transform;
+	};
+}

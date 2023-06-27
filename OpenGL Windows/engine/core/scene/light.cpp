@@ -1,5 +1,7 @@
 #include "light.hpp"
 
+using namespace CEngine;
+
 void Light::SetColor(const Color& c) {
 	color = c;
 }

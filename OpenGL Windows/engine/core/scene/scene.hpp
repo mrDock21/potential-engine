@@ -12,43 +12,46 @@
 
 #include "shading/uniform_buffer.hpp"
 
-class Scene {
-public:
-	// same as shader
-	const int MAX_LIGHTS = 100;
-	const std::string GLOBAL_MATRICES = "GlobalMatrices";
+namespace CEngine {
 
-	Scene();
-	~Scene();
+	class Scene {
+	public:
+		// same as shader
+		const int MAX_LIGHTS = 100;
+		const std::string GLOBAL_MATRICES = "GlobalMatrices";
 
-	void AddActor(std::shared_ptr<Actor>);
-	void RemoveActor(Actor*);
-	void RemoveActor(int);
+		Scene();
+		~Scene();
 
-	/// <summary>
-	///		Initializes the uniform buffer for camera (matrix), and projection (matrix)
-	/// </summary>
-	/// <param name="">	Uniform block name					</param>
-	/// <param name="">	Uniform block binding index			</param>
-	/// <param name="">	Total size (bytes) of the buffer	</param>
-	void InitializeGlobalData(const std::string&, const uint&, const u_long&);
+		void AddActor(std::shared_ptr<Actor>);
+		void RemoveActor(Actor*);
+		void RemoveActor(int);
 
-	/// <summary>
-	///		Renders the scene
-	/// </summary>
-	/// <param name="">	Window's aspect ratio	</param>
-	void Render(const Matrix4&, const Matrix4&);
+		/// <summary>
+		///		Initializes the uniform buffer for camera (matrix), and projection (matrix)
+		/// </summary>
+		/// <param name="">	Uniform block name					</param>
+		/// <param name="">	Uniform block binding index			</param>
+		/// <param name="">	Total size (bytes) of the buffer	</param>
+		void InitializeGlobalData(const std::string&, const uint&, const u_long&);
 
-private:
+		/// <summary>
+		///		Renders the scene
+		/// </summary>
+		/// <param name="">	Window's aspect ratio	</param>
+		void Render(const Matrix4&, const Matrix4&);
 
-	struct SceneActor {
-		uint ID;
-		std::shared_ptr<Actor> Obj;
+	private:
+
+		struct SceneActor {
+			uint ID;
+			std::shared_ptr<Actor> Obj;
+		};
+
+		uint innerCount;
+		std::vector<SceneActor> actors;
+		DirectionalLight sun;
+
+		UBO uniformBuffer;
 	};
-
-	uint innerCount;
-	std::vector<SceneActor> actors;
-	DirectionalLight sun;
-
-	UBO uniformBuffer;
-};
+}

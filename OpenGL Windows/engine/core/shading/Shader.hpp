@@ -15,7 +15,9 @@
 
 #include "types/color.hpp"
 
-class Shader {
+namespace CEngine {
+
+    class Shader {
     public:
         Shader();
         Shader(const std::string&, const std::string&);
@@ -44,4 +46,6 @@ class Shader {
 
         uint _ProgramID;
         std::map<std::string, int> uniforms;
-};
+    };
+}
+

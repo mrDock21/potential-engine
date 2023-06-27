@@ -1,5 +1,7 @@
 #include "vector3.hpp"
 
+using namespace CEngine;
+
 Vector3::Vector3() : vec(0.0f, 0.0f, 0.0f) { }
 
 Vector3::Vector3(const float& value) 
@@ -39,37 +41,37 @@ const Vector3& Vector3::operator += (const Vector3& v) {
     return *this;
 }
 
-Vector3 operator + (Vector3 l, const Vector3& r) { 
+Vector3 CEngine::operator + (Vector3 l, const Vector3& r) {
     l.vec = l.vec + r.vec;
     return l;
 }
 
-Vector3 operator - (Vector3 l, const Vector3& r) { 
+Vector3 CEngine::operator - (Vector3 l, const Vector3& r) {
     l.vec = l.vec - r.vec;
     return l;
 }
 
-Vector3 operator - (Vector3 v) {
+Vector3 CEngine::operator - (Vector3 v) {
     v.vec = -v.vec;
     return v;
 }
 
-Vector3 operator * (Vector3 l, float s) { 
+Vector3 CEngine::operator * (Vector3 l, float s) {
     l.vec = l.vec * s;
     return l;
 }
 
-Vector3 operator / (Vector3 l, float s) { 
+Vector3 CEngine::operator / (Vector3 l, float s) {
     l.vec = l.vec / s;
     return l;
 }
 
-Vector3 operator * (float s, Vector3 r) { 
+Vector3 CEngine::operator * (float s, Vector3 r) {
     r.vec = r.vec * s;
     return r;
 }
 
-Vector3 operator / (float s, Vector3 r) { 
+Vector3 CEngine::operator / (float s, Vector3 r) {
     r.vec = r.vec / s;
     return r;
 }

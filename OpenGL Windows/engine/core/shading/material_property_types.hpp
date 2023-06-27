@@ -4,93 +4,97 @@
 
 #include "shading/Shader.hpp"
 
-class IMaterialProperty {
-public:
-	/**
-	* Updates this uniform in the shader
-	*/
-	virtual void Set(const std::string&, Shader&) = 0;
-};
+namespace CEngine {
 
-class MaterialPropertyInt : public IMaterialProperty {
-public:
-	MaterialPropertyInt(const int& val) : value(val) { }
-	void Value(const int& i) { value = i; }
-	// updates this uniform in shader
-	void Set(const std::string& name, Shader& s) override {
-		s.SetUniform(name, value); 
-	}
+	class IMaterialProperty {
+	public:
+		/**
+		* Updates this uniform in the shader
+		*/
+		virtual void Set(const std::string&, Shader&) = 0;
+	};
 
-private:
-	int value;
-};
+	class MaterialPropertyInt : public IMaterialProperty {
+	public:
+		MaterialPropertyInt(const int& val) : value(val) { }
+		void Value(const int& i) { value = i; }
+		// updates this uniform in shader
+		void Set(const std::string& name, Shader& s) override {
+			s.SetUniform(name, value); 
+		}
 
-class MaterialPropertyFloat : public IMaterialProperty {
-public:
-	MaterialPropertyFloat(const float& val) : value(val) { }
+	private:
+		int value;
+	};
 
-	void Value(const float& f) { value = f; }
-	// updates this uniform in shader
-	void Set(const std::string& name, Shader& s) override { 
-		s.SetUniform(name, value); 
-	}
+	class MaterialPropertyFloat : public IMaterialProperty {
+	public:
+		MaterialPropertyFloat(const float& val) : value(val) { }
 
-private:
-	float value;
-};
+		void Value(const float& f) { value = f; }
+		// updates this uniform in shader
+		void Set(const std::string& name, Shader& s) override { 
+			s.SetUniform(name, value); 
+		}
 
-class MaterialPropertyVector3 : public IMaterialProperty {
-public:
-	MaterialPropertyVector3(const std::string& name, const Vector3& val) : value(val) { }
+	private:
+		float value;
+	};
 
-	void Value(const Vector3& f) { value = f; }
-	// updates this uniform in shader
-	void Set(const std::string& name, Shader& s) override { 
-		s.SetUniform(name, value); 
-	}
+	class MaterialPropertyVector3 : public IMaterialProperty {
+	public:
+		MaterialPropertyVector3(const std::string& name, const Vector3& val) : value(val) { }
 
-private:
-	Vector3 value;
-};
+		void Value(const Vector3& f) { value = f; }
+		// updates this uniform in shader
+		void Set(const std::string& name, Shader& s) override { 
+			s.SetUniform(name, value); 
+		}
 
-class MaterialPropertyVector4 : public IMaterialProperty {
-public:
-	MaterialPropertyVector4(const std::string& name, const Vector4& val) : value(val) { }
+	private:
+		Vector3 value;
+	};
 
-	void Value(const Vector4& f) { value = f; }
-	// updates this uniform in shader
-	void Set(const std::string& name, Shader& s) override { 
-		s.SetUniform(name, value); 
-	}
+	class MaterialPropertyVector4 : public IMaterialProperty {
+	public:
+		MaterialPropertyVector4(const std::string& name, const Vector4& val) : value(val) { }
 
-private:
-	Vector4 value;
-};
+		void Value(const Vector4& f) { value = f; }
+		// updates this uniform in shader
+		void Set(const std::string& name, Shader& s) override { 
+			s.SetUniform(name, value); 
+		}
 
-class MaterialPropertyMatrix4 : public IMaterialProperty {
-public:
-	MaterialPropertyMatrix4(const std::string& name, const Matrix4& val) : value(val) { }
+	private:
+		Vector4 value;
+	};
 
-	void Value(const Matrix4& f) { value = f; }
-	// updates this uniform in shader
-	void Set(const std::string& name, Shader& s) override { 
-		s.SetUniform(name, value); 
-	}
+	class MaterialPropertyMatrix4 : public IMaterialProperty {
+	public:
+		MaterialPropertyMatrix4(const std::string& name, const Matrix4& val) : value(val) { }
 
-private:
-	Matrix4 value;
-};
+		void Value(const Matrix4& f) { value = f; }
+		// updates this uniform in shader
+		void Set(const std::string& name, Shader& s) override { 
+			s.SetUniform(name, value); 
+		}
 
-class MaterialPropertyColor : public IMaterialProperty {
-public:
-	MaterialPropertyColor(const std::string& name, const Color& val) : value(val) { }
+	private:
+		Matrix4 value;
+	};
 
-	void Value(const Color& f) { value = f; }
-	// updates this uniform in shader
-	void Set(const std::string& name, Shader& s) override { 
-		s.SetUniform(name, value); 
-	}
+	class MaterialPropertyColor : public IMaterialProperty {
+	public:
+		MaterialPropertyColor(const std::string& name, const Color& val) : value(val) { }
 
-private:
-	Color value;
-};
+		void Value(const Color& f) { value = f; }
+		// updates this uniform in shader
+		void Set(const std::string& name, Shader& s) override { 
+			s.SetUniform(name, value); 
+		}
+
+	private:
+		Color value;
+	};
+}
+

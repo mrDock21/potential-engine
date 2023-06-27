@@ -8,7 +8,7 @@
 #include "math_types/quaternion.hpp"
 #include "math_types/matrix4.hpp"
 
-namespace Components {
+namespace CEngine {
     /**
      * Stores position, scale and orientation of owner
     */

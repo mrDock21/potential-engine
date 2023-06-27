@@ -1,5 +1,7 @@
 #include "directionallight.hpp"
 
+using namespace CEngine;
+
 DirectionalLight::DirectionalLight(const Vector3& pos, const Vector3& dir) {
 	
 	Transform().Position(pos);

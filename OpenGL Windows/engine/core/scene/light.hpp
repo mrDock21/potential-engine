@@ -5,15 +5,18 @@
 #include "scene/object.hpp"
 #include "types/color.hpp"
 
-class Light : public Object {
-public:
-	// reuse the other constructors...
-	using Object::Object;
+namespace CEngine {
 
-	void SetColor(const Color&);
+	class Light : public Object {
+	public:
+		// reuse the other constructors...
+		using Object::Object;
 
-	Color GetColor() const;
+		void SetColor(const Color&);
 
-private:
-	Color color;
-};
+		Color GetColor() const;
+
+	private:
+		Color color;
+	};
+}

@@ -1,5 +1,7 @@
 #include "scene.hpp"
 
+using namespace CEngine;
+
 Scene::Scene() : innerCount(0), sun("sun", Vector3(1, -1, -1)) {
 
 }

@@ -6,8 +6,14 @@
 #include <filesystem>
 #include <cstring>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "window.hpp"
 #include "controllers/camera.hpp"
+
+#include "shading/Texture.hpp"
 
 #include "scene/actor.hpp"
 #include "scene/spotlight.hpp"
@@ -15,6 +21,8 @@
 #include "ShaderFile.hpp"
 
 #include "scene/scene.hpp"
+
+using namespace CEngine;
 
 /**
  * Compile this with cmake (in root folder)
@@ -199,10 +207,10 @@ class SpotLightExercise : public Window {
             Material* material = new Material(SRC_VERTEX, SRC_FRAG);
             Mesh* mesh;
             // since these are PNGs
-            Texture diffuseTex(DIFFUSE_MAP, Texture::ImgType::PNG),
-                    specularTex(SPECULAR_MAP, Texture::ImgType::PNG),
+            CEngine::Texture diffuseTex(DIFFUSE_MAP, CEngine::Texture::ImgType::PNG),
+                    specularTex(SPECULAR_MAP, CEngine::Texture::ImgType::PNG),
                     // since is JPG
-                    emissionTex(EMISSION_MAP, Texture::ImgType::JPEG);
+                    emissionTex(EMISSION_MAP, CEngine::Texture::ImgType::JPEG);
             
             // enable ZTest buffering!
             Enable(WndBuffer::Depth);
@@ -251,7 +259,7 @@ class SpotLightExercise : public Window {
 
         void OnRenderLight(const Matrix4& view, const Matrix4& proj) {
             Vector4 lightPosViewSpace, forward;
-            const Components::Transform& camT = mainCamera.Transform();
+            const Transform& camT = mainCamera.Transform();
 
             // stick the light to the camera
             light.data.Transform().Position(camT.Position());

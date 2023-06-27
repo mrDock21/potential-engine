@@ -1,5 +1,7 @@
 #include "object.hpp"
 
+using namespace CEngine;
+
 Object::Object() : Name("Object"), transform() {
 
 }
@@ -33,6 +35,6 @@ Object::Object(
 	transform.Scale(scale);
 }
 
-Components::Transform& Object::Transform() {
+CEngine::Transform& Object::Transform() {
 	return transform;
 }

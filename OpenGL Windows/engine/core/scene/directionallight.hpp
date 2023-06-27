@@ -3,16 +3,19 @@
 #include "scene/light.hpp"
 #include "math_types/vector3.hpp"
 
-class DirectionalLight : public Light {
-public:
-	using Light::Light;
+namespace CEngine {
 
-	DirectionalLight(const Vector3&, const Vector3&);
+	class DirectionalLight : public Light {
+	public:
+		using Light::Light;
 
-	void Dir(const Vector3&);
+		DirectionalLight(const Vector3&, const Vector3&);
 
-	Vector3 Dir() const;
+		void Dir(const Vector3&);
 
-private:
-	Vector3 dir;
-};
+		Vector3 Dir() const;
+
+	private:
+		Vector3 dir;
+	};
+}

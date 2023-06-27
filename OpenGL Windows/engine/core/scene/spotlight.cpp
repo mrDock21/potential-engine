@@ -1,5 +1,7 @@
 #include "spotlight.hpp"
 
+using namespace CEngine;
+
 SpotLight::SpotLight() {
 
 }

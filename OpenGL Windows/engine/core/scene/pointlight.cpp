@@ -1,5 +1,7 @@
 #include "pointlight.hpp"
 
+using namespace CEngine;
+
 PointLight::PointLight() { }
 
 PointLight::PointLight(const float& k1, const float& kq, const float& dist) {

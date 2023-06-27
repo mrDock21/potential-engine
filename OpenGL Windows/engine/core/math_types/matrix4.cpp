@@ -1,5 +1,7 @@
 #include "matrix4.hpp"
 
+using namespace CEngine;
+
 Matrix4::Matrix4() : matrix(0.0f) { }
         
 Matrix4::Matrix4(const Matrix4& m) : matrix(m.matrix) { }
@@ -16,7 +18,7 @@ const Matrix4& Matrix4::operator *= (const Matrix4& r) {
     return *this;
 }
 
-Matrix4 operator * (Matrix4 l, const Matrix4& r) {
+Matrix4 CEngine::operator * (Matrix4 l, const Matrix4& r) {
     return Matrix4( l.matrix * r.matrix );
 }
 

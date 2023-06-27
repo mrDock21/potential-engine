@@ -1,6 +1,8 @@
 #include "vertex_buffer.hpp"
 
-uint getGlBufferUsage(const BufferUsage& usage) {
+using namespace CEngine;
+
+uint CEngine::getGlBufferUsage(const BufferUsage& usage) {
     switch (usage)
     {
         case BufferUsage::Static:
@@ -27,7 +29,7 @@ VertexBuffer::VertexBuffer(
     // vertex buffer
     glGenBuffers(1, &ID);
     Use();
-    glBufferData(GL_ARRAY_BUFFER, size, verts, getGlBufferUsage(glUsage));
+    glBufferData(GL_ARRAY_BUFFER, size, verts, CEngine::getGlBufferUsage(glUsage));
 }
 
 /**

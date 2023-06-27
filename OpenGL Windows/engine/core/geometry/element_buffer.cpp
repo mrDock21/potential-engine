@@ -1,5 +1,7 @@
 #include "element_buffer.hpp"
 
+using namespace CEngine;
+
 ElementBuffer::ElementBuffer() : arraySize(0), bytesSize(0) {
 
 }

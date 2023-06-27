@@ -1,5 +1,7 @@
 #include "vector4.hpp"
 
+using namespace CEngine;
+
 Vector4::Vector4() : vec() { }
 
 Vector4::Vector4(const float& n) : vec(n) { }
@@ -42,32 +44,32 @@ const Vector4& Vector4::operator += (const Vector4& r) {
     return *this;
 }
 
-Vector4 operator + (Vector4 l, const Vector4& r) {
+Vector4 CEngine::operator + (Vector4 l, const Vector4& r) {
     l.vec = l.vec + r.vec;
     return l;
 }
 
-Vector4 operator - (Vector4 l, const Vector4& r) {
+Vector4 CEngine::operator - (Vector4 l, const Vector4& r) {
     l.vec = l.vec - r.vec;
     return l;
 }
 
-Vector4 operator * (Vector4 v, float s) {
+Vector4 CEngine::operator * (Vector4 v, float s) {
     v.vec = v.vec * s;
     return v;
 }
 
-Vector4 operator / (Vector4 v, float s) {
+Vector4 CEngine::operator / (Vector4 v, float s) {
     v.vec = v.vec / s;
     return v;
 }
 
-Vector4 operator * (float s, Vector4 v) {
+Vector4 CEngine::operator * (float s, Vector4 v) {
     v = v * s;
     return v;
 }
 
-Vector4 operator / (float s, Vector4 v) {
+Vector4 CEngine::operator / (float s, Vector4 v) {
     v = v / s;
     return v;
 }

@@ -1,5 +1,7 @@
 #include "Mesh.hpp"
 
+using namespace CEngine;
+
 Mesh::Mesh() { }
 
 /**

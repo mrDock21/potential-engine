@@ -1,6 +1,6 @@
 #include "camera.hpp"
 
-//using namespace CustomOps;
+using namespace CEngine;
 
 /**
  * Initializes camera at position (0, 0, 3) and looking towards negative Z
@@ -52,7 +52,7 @@ void Camera::RotateRoll(const float& angleZ) {
     transform.RotateEulers(Vector3(0.0f,  0.0f, angleZ));
 }
 
-const Components::Transform& Camera::Transform() const {
+const CEngine::Transform& Camera::Transform() const {
     return transform;
 }
 

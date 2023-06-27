@@ -1,6 +1,8 @@
 #include "transform.hpp"
 
-Components::Transform::Transform() 
+using namespace CEngine;
+
+Transform::Transform() 
 : position(0.0f), scale(1.0f) {
     Quaternion identity = Quaternion();
     // initialize both rotations in zeros
@@ -8,7 +10,7 @@ Components::Transform::Transform()
     SetGlobalRotation(identity);
 }
 
-Components::Transform::Transform(const Components::Transform& other)
+Transform::Transform(const Transform& other)
 : position(other.position), scale(other.scale),
   forward(other.forward), right(other.right), up(other.up), 
   rotation(other.rotation), globalRotation(other.globalRotation), 
@@ -17,35 +19,35 @@ Components::Transform::Transform(const Components::Transform& other)
 /**
  * Translates position by given direction
 */
-void Components::Transform::Translate(const Vector3& dir) {
+void Transform::Translate(const Vector3& dir) {
     position += dir;
 }
 
 /**
  * Updates position with new given
 */
-void Components::Transform::Position(const Vector3& newPos) {
+void Transform::Position(const Vector3& newPos) {
     position = newPos;
 }
 
 /**
  * Updates scale with new given
 */
-void Components::Transform::Scale(const Vector3& newScale) {
+void Transform::Scale(const Vector3& newScale) {
     scale = newScale;
 }
 
 /**
  * Updates scale uniformly
 */
-void Components::Transform::Scale(const float& s) {
+void Transform::Scale(const float& s) {
     scale = s * scale;
 }
 
 /**
  * Overrides current rotation with given, in degrees
 */
-void Components::Transform::EulerAngles(const Vector3& eulers) {
+void Transform::EulerAngles(const Vector3& eulers) {
     Rotation( Quaternion(eulers) );
 }
 
@@ -53,14 +55,14 @@ void Components::Transform::EulerAngles(const Vector3& eulers) {
  * Rotates in LOCAL space by amount euler angles given
  * @param deltaEulers Rotation made (euler angles) in degrees
 */
-void Components::Transform::RotateEulers(const Vector3& deltaEulers) {
+void Transform::RotateEulers(const Vector3& deltaEulers) {
     Rotate( Quaternion(deltaEulers) );
 }
 
 /**
  * Overrides current rotation with given
 */
-void Components::Transform::Rotation(const Quaternion& rot) {
+void Transform::Rotation(const Quaternion& rot) {
 
     rotation = rot;
     rotationMatrix = Matrix4::FromQuaternion(rotation);
@@ -72,7 +74,7 @@ void Components::Transform::Rotation(const Quaternion& rot) {
  * Rotates in LOCAL space by amount given
  * @param deltaRot Rotation made (quaternion)
 */
-void Components::Transform::Rotate(const Quaternion& deltaRot) {
+void Transform::Rotate(const Quaternion& deltaRot) {
     rotation = rotation * deltaRot;
     rotationMatrix = Matrix4::FromQuaternion(rotation);
 
@@ -84,14 +86,14 @@ void Components::Transform::Rotate(const Quaternion& deltaRot) {
  * @param angleDelta angle (degrees) to rotate
  * @param axis Rotation will be done around given axis
 */
-void Components::Transform::Rotate(const float& angleDelta, const Vector3& axis) {
+void Transform::Rotate(const float& angleDelta, const Vector3& axis) {
     globalRotation = globalRotation * Quaternion::AngleAxis(angleDelta, axis);
     globalRotationMatrix = Matrix4::FromQuaternion(globalRotation);
 
     ComputeForwardAndRight();
 }
 
-void Components::Transform::SetGlobalRotation(const Quaternion& globalRot) {
+void Transform::SetGlobalRotation(const Quaternion& globalRot) {
     globalRotation = globalRot;
     globalRotationMatrix = Matrix4::FromQuaternion(globalRotation);
 
@@ -101,7 +103,7 @@ void Components::Transform::SetGlobalRotation(const Quaternion& globalRot) {
 /**
 * Rotates in
 */
-void Components::Transform::Forward(const Vector3& dir) {
+void Transform::Forward(const Vector3& dir) {
     float angleX, angleY, angleZ;
     Vector3 uDir = dir.Normalized();
     Vector2 dirXZ(uDir.X(), uDir.Z()), 
@@ -119,56 +121,56 @@ void Components::Transform::Forward(const Vector3& dir) {
 /**
  * Gets position's copy
 */
-Vector3 Components::Transform::Position() const { return position; }
+Vector3 Transform::Position() const { return position; }
 
 /**
  * Gets scale's copy
 */
-Vector3 Components::Transform::Scale() const { return scale;  }
+Vector3 Transform::Scale() const { return scale;  }
 
 /**
  * Gets rotation's copy
 */
-Quaternion Components::Transform::Rotation() const { return rotation; }
+Quaternion Transform::Rotation() const { return rotation; }
 
 /**
  * Gets local rotation as euler angles
 */
-Vector3 Components::Transform::EulerAngles() const { 
+Vector3 Transform::EulerAngles() const { 
     return rotation.EulerAngles(); 
 }
 
 /**
  * Gets rotation in world space as copy
 */
-Quaternion Components::Transform::GlobalRotation() const { return globalRotation; }
+Quaternion Transform::GlobalRotation() const { return globalRotation; }
 
 /**
  * Gets global rotation as euler angles
 */
-Vector3 Components::Transform::GlobalEulersAngles() const {
+Vector3 Transform::GlobalEulersAngles() const {
     return globalRotation.EulerAngles();
 }
 
 /**
  * Gets forward's vector copy
 */
-Vector3 Components::Transform::Forward() const { return forward; }
+Vector3 Transform::Forward() const { return forward; }
 
 /**
  * Gets right's vector copy
 */
-Vector3 Components::Transform::Right() const { return right;  }
+Vector3 Transform::Right() const { return right;  }
 
 /**
  * Gets up's vector copy
 */
-Vector3 Components::Transform::Up() const { return up; }
+Vector3 Transform::Up() const { return up; }
 
 /**
  * Gets Model matrix of this transform
 */
-Matrix4 Components::Transform::ModelMatrix() const {
+Matrix4 Transform::ModelMatrix() const {
     // at last: translate
     Matrix4 model = Matrix4::Translate(Matrix4::Indentity(), position);
     // third: global space rotation
@@ -186,7 +188,7 @@ Matrix4 Components::Transform::ModelMatrix() const {
  * @param radX Rotation on X axis
  * @param radY Rotation on Y axis
 */
-void Components::Transform::ComputeForwardAndRight() {
+void Transform::ComputeForwardAndRight() {
     Matrix4 rotMat = globalRotationMatrix * rotationMatrix;
     Vector4 f, u, r;
     // rotate global forward by local rot
@@ -201,7 +203,7 @@ void Components::Transform::ComputeForwardAndRight() {
     up = u.ToVector3();
 }
 
-Components::Transform& Components::Transform::operator= (const Components::Transform& other) {
+Transform& Transform::operator= (const Transform& other) {
     this->position = other.position;
     this->scale = other.scale;
 

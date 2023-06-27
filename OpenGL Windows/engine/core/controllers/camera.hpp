@@ -2,23 +2,26 @@
 
 #include "math_types/transform.hpp"
 
-class Camera {
-    public:
+namespace CEngine {
 
-        Camera();
-        Camera(const Vector3&);
-        void Move(const Vector3&);
-        void RotateYaw(const float&);
-        void RotatePitch(const float&);
-        void RotateRoll(const float&);
+    class Camera {
+        public:
 
-        const Components::Transform& Transform() const;
+            Camera();
+            Camera(const Vector3&);
+            void Move(const Vector3&);
+            void RotateYaw(const float&);
+            void RotatePitch(const float&);
+            void RotateRoll(const float&);
 
-        Matrix4 GetViewMatrix() const;
+            const CEngine::Transform& Transform() const;
 
-    private:
-        Components::Transform transform;
+            Matrix4 GetViewMatrix() const;
 
-        const float MAX_INCLINATION = 0.93f;
-        const float MIN_INCLINATION = -0.93f;
-};
+        private:
+            CEngine::Transform transform;
+
+            const float MAX_INCLINATION = 0.93f;
+            const float MIN_INCLINATION = -0.93f;
+    };
+}

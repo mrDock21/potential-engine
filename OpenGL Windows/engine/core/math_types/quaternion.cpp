@@ -1,5 +1,7 @@
 #include "quaternion.hpp"
 
+using namespace CEngine;
+
 Quaternion::Quaternion() : quaternion() { }
 
 Quaternion::Quaternion(const Vector3& angles) {
@@ -32,7 +34,7 @@ const Quaternion& Quaternion::operator *= (const Quaternion& r) {
     return *this;
 }
 
-Quaternion operator * (Quaternion l, const Quaternion& r) {
+Quaternion CEngine::operator * (Quaternion l, const Quaternion& r) {
     l.quaternion = l.quaternion * r.quaternion;
     return l;
 }

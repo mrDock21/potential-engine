@@ -1,5 +1,7 @@
 #include "actor.hpp"
 
+using namespace CEngine;
+
 Actor::Actor() : Object() { }
 
 

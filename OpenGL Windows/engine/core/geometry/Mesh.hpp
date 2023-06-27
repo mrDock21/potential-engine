@@ -11,20 +11,24 @@
 #include "math_types/transform.hpp"
 #include "types/types.hpp"
 
-class Mesh {
-    public:
-        Mesh();
-        Mesh(float[], const u_long&, const u_long&, uint[], const u_long&);
-        Mesh(float[], const u_long&, const u_long&);
+namespace CEngine {
 
-        void SetAttribute(const int&, const int&, const uint&, const bool&, const u_long&, const u_long&) const;
-        void Use() const;
-        void Render() const;
-        void Draw() const;
+    class Mesh {
+        public:
+            Mesh();
+            Mesh(float[], const u_long&, const u_long&, uint[], const u_long&);
+            Mesh(float[], const u_long&, const u_long&);
 
-    private:
-        uint VAO;
-        VertexBuffer VBO;
-        ElementBuffer EBO;
-        bool usesEBO;
-};
+            void SetAttribute(const int&, const int&, const uint&, const bool&, const u_long&, const u_long&) const;
+            void Use() const;
+            void Render() const;
+            void Draw() const;
+
+        private:
+            uint VAO;
+            VertexBuffer VBO;
+            ElementBuffer EBO;
+            bool usesEBO;
+    };
+}
+

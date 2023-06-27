@@ -11,7 +11,9 @@
 
 #include "uniform_buffer.hpp"
 
-class Material {
+namespace CEngine {
+
+    class Material {
     public:
         Material();
         Material(const std::string&, const std::string&);
@@ -36,4 +38,6 @@ class Material {
         std::vector<Texture> textures; // each may have different textures...
 
         bool linkedToScene;
-};
+    };
+}
+

@@ -1,5 +1,7 @@
 #include "vector2.hpp"
 
+using namespace CEngine;
+
 Vector2::Vector2() : vec(0.0f, 0.0f) { }
 
 Vector2::Vector2(const float& x, const float& y) : vec(x, y) { }

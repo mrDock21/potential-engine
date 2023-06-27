@@ -62,7 +62,7 @@ class Window {
     private:
         GLFWwindow* window;
         ImGuiIO* imgui_io;
-        uint wndRenderBuffer;
+        CEngine::uint wndRenderBuffer;
         int width, height;
 
         void InitGlad() const;
