@@ -31,13 +31,11 @@ namespace CEngine {
         void SetUniform(const std::string&, const Matrix4&);
         void SetUniform(const std::string&, const Color&);
 
-        inline bool LinkedToScene() const;
-
     private:
         Shader shader;
-        std::vector<Texture> textures; // each may have different textures...
+        std::vector<Texture> textures;          // each may have different textures...
 
-        bool linkedToScene;
+        std::vector<uint> linkedUniformBlocks;  // linked uniforms
     };
 }
 

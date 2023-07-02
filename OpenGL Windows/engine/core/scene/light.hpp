@@ -14,6 +14,12 @@ namespace CEngine {
 
 		void SetColor(const Color&);
 
+		virtual void Initialize(const UBO& matricesUBO, const UBO& lightsUBO) {
+			/* Not used for now */
+		}
+
+		virtual void Render(){ /* Not used for now */ }
+
 		Color GetColor() const;
 
 	private:

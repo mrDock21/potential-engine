@@ -16,24 +16,23 @@ namespace CEngine {
 
 	class Scene {
 	public:
-		// same as shader
-		const int MAX_LIGHTS = 100;
-		const std::string GLOBAL_MATRICES = "GlobalMatrices";
+		// same as shaders
+		const int MAX_LIGHTS = 10;
+		const int GMATRICES_UBO_INDEX = 0, GLIGHTS_UBO_INDEX = 1;
+		const std::string GMATRICES_UBO_NAME = "GlobalMatrices", 
+						  GLIGHTS_UBO_NAME = "GlobalLights";
 
 		Scene();
 		~Scene();
 
-		void AddActor(std::shared_ptr<Actor>);
+		void AddObject(std::shared_ptr<Object>);
 		void RemoveActor(Actor*);
 		void RemoveActor(int);
 
 		/// <summary>
 		///		Initializes the uniform buffer for camera (matrix), and projection (matrix)
 		/// </summary>
-		/// <param name="">	Uniform block name					</param>
-		/// <param name="">	Uniform block binding index			</param>
-		/// <param name="">	Total size (bytes) of the buffer	</param>
-		void InitializeGlobalData(const std::string&, const uint&, const u_long&);
+		void InitializeGlobalData();
 
 		/// <summary>
 		///		Renders the scene
@@ -43,15 +42,14 @@ namespace CEngine {
 
 	private:
 
-		struct SceneActor {
+		struct SceneObject {
 			uint ID;
-			std::shared_ptr<Actor> Obj;
+			std::shared_ptr<Object> Obj;
 		};
 
 		uint innerCount;
-		std::vector<SceneActor> actors;
-		DirectionalLight sun;
+		std::vector<SceneObject> actors;
 
-		UBO uniformBuffer;
+		UBO globalMatricesBuffer, globalLightsBuffer;
 	};
 }

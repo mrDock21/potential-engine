@@ -2,7 +2,7 @@
 
 using namespace CEngine;
 
-Material::Material() : linkedToScene(false) { }
+Material::Material() { }
 
 /**
  * Initializes material with given shader src
@@ -10,7 +10,7 @@ Material::Material() : linkedToScene(false) { }
  * @param fragSrc Source code of fragment shader
 */
 Material::Material(const std::string& vertexSrc, const std::string& fragSrc) 
-    : shader(vertexSrc, fragSrc), linkedToScene(false) { }
+    : shader(vertexSrc, fragSrc) { }
 
 void Material::Use() const {
     shader.Use();
@@ -21,12 +21,19 @@ void Material::SetShader(const Shader& shader) {
 }
 
 void Material::SetUniformBlock(const UBO& ubo) {
+    bool alreadyLinked = false;
 
-    if (linkedToScene)
+    // make sure we are not linking it twice...
+    for (int i(0); i < linkedUniformBlocks.size() && !alreadyLinked; i++) {
+        alreadyLinked = linkedUniformBlocks.at(i) == ubo.ID();
+    }
+
+    if (alreadyLinked)
         return;
 
+    // link the uniform to the shader program
     shader.SetUniformBlock(ubo.UniformBlockName(), ubo.BindingIndex());
-    linkedToScene = true;
+    linkedUniformBlocks.push_back(ubo.ID());
 }
 
 void Material::SetTexture(const Texture& t) {
@@ -67,6 +74,3 @@ void Material::SetUniform(const std::string& name, const Color& value) {
     shader.SetUniform(name, value);
 }
 
-inline bool Material::LinkedToScene() const {
-    return linkedToScene;
-}

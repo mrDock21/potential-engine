@@ -24,6 +24,14 @@ void Actor::SetMaterial(Material* m) {
 	// rebing VAO with new material
 }
 
+// From renderable interface...
+void Actor::Initialize(const UBO& globalMatrices, const UBO& globalLights) {
+
+	// set both, since lights affect meshes...
+	materialPtr->SetUniformBlock(globalMatrices);
+	materialPtr->SetUniformBlock(globalLights);
+}
+
 void Actor::Render() {
 	// draw the entire object at once
 	BeginRender();
@@ -36,7 +44,7 @@ void Actor::BeginRender() {
 	// binds shaders & textures
 	materialPtr->Render();
 
-	// set base uniforms
+	// set base uniforms (model is for the mesh)
 	materialPtr->SetUniform("model", Transform().ModelMatrix());
 }
 

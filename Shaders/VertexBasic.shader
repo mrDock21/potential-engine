@@ -12,6 +12,7 @@ out vec4 fragPos;
 uniform mat4 model;
 
 // uniform block for common matrices
+//	binding Index = 0 (same as Scene.hpp)
 layout(std140) uniform GlobalMatrices {
 	mat4 view;
 	mat4 projection;

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+#include "iscene_renderable.hpp"
+
 #include "math_types/transform.hpp"
 
 namespace CEngine {
@@ -10,7 +12,7 @@ namespace CEngine {
 	/**
 	* Represents an empty object in a scene
 	*/
-	class Object {
+	class Object : public ISceneRenderable {
 	public:
 		std::string Name;
 

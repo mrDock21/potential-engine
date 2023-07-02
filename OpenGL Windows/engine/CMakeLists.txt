@@ -27,5 +27,5 @@ set (CORE_FILES
 	core/scene/pointlight.cpp 
 	core/scene/spotlight.cpp 
 	core/scene/scene.cpp 
-)
+ "core/geometry/vertex.cpp")
 add_library (engine ${CORE_FILES})

@@ -20,7 +20,7 @@ UBO::UBO (
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	// func(command, bindingPoint, bufferID, offset, size)
-	// This will bind the amount given in "size" to the location given in "bindingPoint"
+	// This will bind the amount given in "size" to the location given in "bindingIndex"
 	//	for the buffer "bufferID"
 	glBindBufferRange(GL_UNIFORM_BUFFER, bindingIndex, id, offset, esize);
 }

@@ -22,13 +22,15 @@ namespace CEngine {
 		void SetMesh(Mesh*);
 		void SetMaterial(Material*);
 
+		virtual void Initialize(const UBO& matricesUBO, const UBO& lightsUBO);
 		/// <summary>
 		///		Renders and draws the entire object. 
 		///		If shader properties are needed: use BeginRender() instead
 		/// </summary>
 		/// <param name="">	View matrix			</param>
 		/// <param name="">	Projection matrix	</param>
-		void Render();
+		virtual void Render();
+
 		/// <summary>
 		///		Binds OpenGL object (gives room to set shader properties).
 		///		Must call EndRender()
