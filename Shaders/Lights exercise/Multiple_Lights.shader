@@ -3,6 +3,7 @@
 in vec2 texCoord;
 in vec3 normal;
 in vec4 fragPos;
+in mat4 viewMatrix;
 out vec4 FragColor;
 
 // textures
@@ -28,13 +29,13 @@ struct Material {
 };
 
 // light and main material
-uniform Light light;
 uniform Material material;
 
 // uniform block for global lights
+#define MAX_LIGHTS 10
 //	binding Index = 1 (see Scene.hpp)
-layout(std140) uniform GlobalLights{
-	PointLight lights[10];
+layout(std140) uniform GlobalLights {
+	PointLight lights[MAX_LIGHTS];
 	SunLight sun;
 	float numLights;
 };
@@ -63,7 +64,7 @@ void main() {
 }
 
 vec3 computeDirectionalLight(vec3 normal, vec3 viewDir) {
-	vec3 lightDir = normalize(sun.direction);
+	vec3 lightDir = normalize( ( viewMatrix * vec4(sun.direction.xyz, 0.0) ).xyz );
 	// diffuse
 	float diffuseFactor = max(dot(normal, -lightDir), 0);
 
@@ -79,11 +80,11 @@ vec3 computeDirectionalLight(vec3 normal, vec3 viewDir) {
 
 	// ambient
 	vec3 texColor = texture(diffuseTexture, texCoord).rgb,
-		color = sun.ambient * texColor;
+		color = sun.ambient.xyz * texColor;
 	// diffuse
-	color += diffuseFactor * texColor * sun.color;
+	color += diffuseFactor * texColor * sun.color.xyz;
 	// specular
-	color += specularFactor * sun.color * specularFlag;
+	color += specularFactor * sun.color.xyz * specularFlag;
 	// emission
 	color += (1.0 - step(0.1, specularFlag)) * emissionFlag * emissionColor;
 
@@ -92,9 +93,10 @@ vec3 computeDirectionalLight(vec3 normal, vec3 viewDir) {
 
 vec3 computePointLight(vec3 normal, PointLight pLight, vec3 viewDir, vec3 fragPos) {
 	// point light calculations
-	vec3 lightDir = normalize(light.position - fragPos);
+	vec3 lPos = (viewMatrix * vec4(pLight.position, 1.0)).xyz;
+	vec3 lightDir = normalize(lPos - fragPos);
 	float k1 = 0.09f, kq = 0.032f;
-	float dist = distance(pLight.position, fragPos),
+	float dist = distance(lPos, fragPos),
 		att = 1.0f / (1.0f + k1 * dist + kq * (dist * dist));
 
 	// diffuse

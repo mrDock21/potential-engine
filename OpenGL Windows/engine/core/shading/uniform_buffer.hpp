@@ -5,7 +5,12 @@
 #include <string>
 
 #include "math_types/matrix4.hpp"
+#include "math_types/vector2.hpp"
+#include "math_types/vector3.hpp"
+#include "math_types/vector4.hpp"
+
 #include "types/types.hpp"
+#include "types/color.hpp"
 
 namespace CEngine {
 
@@ -30,6 +35,30 @@ namespace CEngine {
 		/// <param name="">	The data									</param>
 		/// <param name="">	The initial offset of where the data starts	</param>
 		void Upload(const Matrix4&, const unsigned long long&);
+		/// <summary>
+		///		Uploads a vector2 to the uniform buffer
+		/// </summary>
+		/// <param name="">	The data									</param>
+		/// <param name="">	The initial offset of where the data starts	</param>
+		void Upload(const Vector2&, const unsigned long long&);
+		/// <summary>
+		///		Uploads a vector3 to the uniform buffer
+		/// </summary>
+		/// <param name="">	The data									</param>
+		/// <param name="">	The initial offset of where the data starts	</param>
+		void Upload(const Vector3&, const unsigned long long&);
+		/// <summary>
+		///		Uploads a vector4 to the uniform buffer
+		/// </summary>
+		/// <param name="">	The data									</param>
+		/// <param name="">	The initial offset of where the data starts	</param>
+		void Upload(const Vector4&, const unsigned long long&);
+		/// <summary>
+		///		Uploads a float scalar to the uniform buffer
+		/// </summary>
+		/// <param name="">	The data									</param>
+		/// <param name="">	The initial offset of where the data starts	</param>
+		void Upload(const float&, const unsigned long long&);
 
 		uint ID() const;
 		uint BindingIndex() const;

@@ -10,6 +10,7 @@ namespace CEngine {
 		using Light::Light;
 
 		DirectionalLight(const Vector3&, const Vector3&);
+		DirectionalLight();
 
 		void Dir(const Vector3&);
 

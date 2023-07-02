@@ -22,9 +22,13 @@ namespace CEngine {
 		const std::string GMATRICES_UBO_NAME = "GlobalMatrices", 
 						  GLIGHTS_UBO_NAME = "GlobalLights";
 
+		const unsigned long long LIGHTS_ARRAY_SIZE = Vector4::Size() * 2 * MAX_LIGHTS,
+								 SUN_STRUCT_SIZE = Vector4::Size() * 3;
+
 		Scene();
 		~Scene();
 
+		void AddPointLight(std::shared_ptr<PointLight>);
 		void AddObject(std::shared_ptr<Object>);
 		void RemoveActor(Actor*);
 		void RemoveActor(int);
@@ -42,13 +46,19 @@ namespace CEngine {
 
 	private:
 
+		void UpdateLights();
+		void UpdateSun();
+
 		struct SceneObject {
 			uint ID;
 			std::shared_ptr<Object> Obj;
 		};
 
-		uint innerCount;
+		uint innerCount, lightCount;
 		std::vector<SceneObject> actors;
+
+		Light* lights[10];
+		DirectionalLight sun;
 
 		UBO globalMatricesBuffer, globalLightsBuffer;
 	};

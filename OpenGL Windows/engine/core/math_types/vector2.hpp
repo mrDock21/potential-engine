@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace CEngine {
 
@@ -20,6 +21,10 @@ namespace CEngine {
             float Y() const;
 
             Vector2 Normalized() const;
+
+            inline const float* ValuePtr() const { return glm::value_ptr(vec); }
+            inline static unsigned long long Size() { return sizeof(glm::vec2); }
+
 
             const Vector2& operator = (const Vector2&);
             const Vector2& operator + (const Vector2&);

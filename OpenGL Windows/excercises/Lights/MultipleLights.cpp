@@ -52,9 +52,9 @@ std::string readShader(std::string file) {
     return s.Code();
 }
 
-class SpotLightExercise : public Window {
+class MultipleLightsExercise : public Window {
     public:
-        SpotLightExercise(const std::string& wnd, const int& w, const int h)
+        MultipleLightsExercise(const std::string& wnd, const int& w, const int h)
             : Window(wnd, w, h), mainCamera() {
                 // init light data
                 light.ambient = Color(0.5f, 0.5f, 0.5f);
@@ -67,16 +67,8 @@ class SpotLightExercise : public Window {
                 mainScene.InitializeGlobalData();
             }
 
-        ~SpotLightExercise() {
+        ~MultipleLightsExercise() {
             std::cout << "[Multiple-Cubes::FreesMemory]" << std::endl;
-        }
-
-        void CreateLight() {
-            // there is no mesh for the light now
-            light.data.Name = "Name";;
-            // set white as color
-            light.data.SetColor(Color::White);
-            light.ambient = Color(AMBIENT_FACTOR, AMBIENT_FACTOR, AMBIENT_FACTOR);
         }
         
         void UpdateMouseLook() {
@@ -251,8 +243,21 @@ class SpotLightExercise : public Window {
             Logger::Log("Initializes the data =>");
 
             cube = std::make_shared<Actor>( "Cube", mesh, material );
+            
+            auto pLight = std::make_shared<PointLight>();
+            auto pLight2 = std::make_shared<PointLight>();
+            auto pLight3 = std::make_shared<PointLight>();
+            pLight->Transform().Position(Vector3(-1, 1, 0));
+            pLight->SetColor(Color::Blue);
+            pLight2->Transform().Position(Vector3(1, -1, 0));
+            pLight2->SetColor(Color::Green);
+            pLight3->Transform().Position(Vector3(0, 0, -1));
+            pLight3->SetColor(Color::From255(255, 255, 255));
+
             mainScene.AddObject( cube );
-            CreateLight();
+            mainScene.AddPointLight(pLight);
+            mainScene.AddPointLight(pLight2);
+            mainScene.AddPointLight(pLight3);
         }
 
         void OnRenderLight(const Matrix4& view, const Matrix4& proj) {
@@ -293,14 +298,14 @@ class SpotLightExercise : public Window {
             // update uniforms
             cube->material()->SetUniform("material.shininess", cubeData.shininess);
             
-            cube->material()->SetUniform("light.position", light.viewPos);
-            cube->material()->SetUniform("light.ambient", light.ambient);
-            cube->material()->SetUniform("light.specular", light.specular);
-            cube->material()->SetUniform("light.color", light.data.GetColor());
+            //cube->material()->SetUniform("light.position", light.viewPos);
+            //cube->material()->SetUniform("light.ambient", light.ambient);
+            //cube->material()->SetUniform("light.specular", light.specular);
+            //cube->material()->SetUniform("light.color", light.data.GetColor());
             //cube->SetUniform<float>("light.k1", light.data.K1());
             //cube->SetUniform<float>("light.kq", light.data.Kq());
-            cube->material()->SetUniform("light.maxAngle", light.data.SpotAngle());
-            cube->material()->SetUniform("light.forward", -Vector3::Forward());// light.forward);
+            //cube->material()->SetUniform("light.maxAngle", light.data.SpotAngle());
+            //cube->material()->SetUniform("light.forward", -Vector3::Forward());// light.forward);
             
             cube->EndRender();
 
@@ -320,8 +325,8 @@ class SpotLightExercise : public Window {
         // NOTE: these paths is relative to the 
         //  console's location which is in the "out/..." folder!!!
         // shaders...
-        const std::string SRC_VERTEX = readShader(rootFolder("Shaders/VertexBasic.shader")),
-                          SRC_FRAG = readShader(rootFolder("Shaders/Lights exercise/Spot_Light.shader"));
+        const std::string SRC_VERTEX = readShader(rootFolder("Shaders/MultipleLights_Vertex.shader")),
+                          SRC_FRAG = readShader(rootFolder("Shaders/Lights exercise/Multiple_Lights.shader"));
         // textures
         const std::string DIFFUSE_MAP = rootFolder("assets/box-container.png"),
                           SPECULAR_MAP = rootFolder("assets/box-container-specular.png"),
@@ -334,7 +339,7 @@ int main() {
 
     std::cout << "Current PATH => " << std::filesystem::current_path() << std::endl;
 
-    SpotLightExercise wnd("LearnOpenGL => Spot light", 800, 600);
+    MultipleLightsExercise wnd("LearnOpenGL => Spot light", 800, 600);
 
     // init random seed
     srand(time(nullptr));

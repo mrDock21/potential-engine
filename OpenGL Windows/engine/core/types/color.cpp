@@ -46,6 +46,14 @@ void Color::RGBA(const float& r, const float& g, const float& b, const float& a)
 	RGB(r, g, b); A(a);
 }
 
+void Color::Set255(const Vector3& v) {
+	color = Vector4(v.X(), v.Y(), v.Z(), 1.0f) / 255.0f;
+}
+
+void Color::Set255(const Vector4& v) {
+	color = v / 255.0f;
+}
+
 Vector3 Color::RGB() const {
 	return color.ToVector3();
 }
@@ -68,6 +76,26 @@ float Color::B() const {
 
 float Color::A() const {
 	return color.W();
+}
+
+Color Color::From255(const float& r, const float& g, const float& b) {
+	return From255(Vector3(r, g, b) / 255.0f);
+}
+
+Color Color::From255(const float& r, const float& g, const float& b, const float& a) {
+	return From255(Vector4(r, g, b, a) / 255.0f);
+}
+
+Color Color::From255(const Vector3& v) {
+	Color result;
+	result.Set255(v);
+	return result;
+}
+
+Color Color::From255(const Vector4& v) {
+	Color result;
+	result.Set255(v);
+	return result;
 }
 
 Color& Color::operator=(const Color& other)

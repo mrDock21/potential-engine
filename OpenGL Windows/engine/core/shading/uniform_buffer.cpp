@@ -41,6 +41,38 @@ void UBO::Upload(const Matrix4& m, const unsigned long long& offset) {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void UBO::Upload(const Vector2& v, const unsigned long long& offset) {
+	Use();
+	// func(command, offset, size, ptr)
+	// Will upload the data in "M" to the uniform block buffer data
+	glBufferSubData(GL_UNIFORM_BUFFER, offset, Vector2::Size(), v.ValuePtr());
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void UBO::Upload(const Vector3& v, const unsigned long long& offset) {
+	Use();
+	// func(command, offset, size, ptr)
+	// Will upload the data in "M" to the uniform block buffer data
+	glBufferSubData(GL_UNIFORM_BUFFER, offset, Vector3::Size(), v.ValuePtr());
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void UBO::Upload(const Vector4& v, const unsigned long long& offset) {
+	Use();
+	// func(command, offset, size, ptr)
+	// Will upload the data in "M" to the uniform block buffer data
+	glBufferSubData(GL_UNIFORM_BUFFER, offset, Vector4::Size(), v.ValuePtr());
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void UBO::Upload(const float& f, const unsigned long long& offset) {
+	Use();
+	// func(command, offset, size, ptr)
+	// Will upload the data in "M" to the uniform block buffer data
+	glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(float), &f);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 uint UBO::ID() const {
 	return id;
 }

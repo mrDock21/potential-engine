@@ -20,7 +20,7 @@ add_subdirectory ("engine")
 
 # To compile a specific exercise: replace line 21
 add_executable (CMakeTarget 
-	"excercises/Lights/SpotLight.cpp" # Only ONE exercise.CPP file should be here
+	"excercises/Lights/MultipleLights.cpp" # Only ONE exercise.CPP file should be here
 
 	#vendor files
 	"vendor/glad/src/glad.c"
