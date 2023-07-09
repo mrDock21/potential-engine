@@ -44,6 +44,8 @@ namespace CEngine {
 		/// <param name="">	Window's aspect ratio	</param>
 		void Render(const Matrix4&, const Matrix4&);
 
+		std::shared_ptr<Object> GetChild(const int&);
+
 	private:
 
 		void UpdateLights();

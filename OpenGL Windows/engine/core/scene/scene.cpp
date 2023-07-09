@@ -78,6 +78,14 @@ void Scene::Render(const Matrix4& view, const Matrix4& proj) {
 	// update the rest of lights
 	UpdateLights();
 	UpdateSun();
+
+	for (int i(0); i < actors.size(); i++) {
+		actors.at(i).Obj->Render();
+	}
+}
+
+std::shared_ptr<Object> Scene::GetChild(const int& i) {
+	return actors.at(i).Obj;
 }
 
 void Scene::UpdateLights() {

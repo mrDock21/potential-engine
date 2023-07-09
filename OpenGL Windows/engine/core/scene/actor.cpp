@@ -5,14 +5,14 @@ using namespace CEngine;
 Actor::Actor() : Object() { }
 
 
-Actor::Actor(Mesh* meshPtr, Material* matPtr) 
-	: Object(), mesh(meshPtr), materialPtr(matPtr) {
+Actor::Actor(Mesh* mPtr, Material* matPtr) 
+	: Object(), meshPtr(mPtr), materialPtr(matPtr) {
 }
 
 Actor::Actor(const std::string& name) : Object(name) { }
 
-Actor::Actor(const std::string& name, Mesh* meshPtr, Material* matPtr) 
-	: Object(name), mesh(meshPtr), materialPtr(matPtr) {
+Actor::Actor(const std::string& name, Mesh* mPtr, Material* matPtr) 
+	: Object(name), meshPtr(mPtr), materialPtr(matPtr) {
 	
 }
 
@@ -21,7 +21,13 @@ void Actor::SetMesh(Mesh* m) {
 }
 
 void Actor::SetMaterial(Material* m) {
-	// rebing VAO with new material
+	// delete the older one
+	materialPtr.reset();
+	materialPtr = std::unique_ptr<Material>(m);
+
+	// rebind VAO with new material
+	meshPtr->Use();
+	materialPtr->Use();
 }
 
 // From renderable interface...
@@ -40,7 +46,7 @@ void Actor::Render() {
 
 void Actor::BeginRender() {
 	// binds VAO
-	mesh->Render();
+	meshPtr->Render();
 	// binds shaders & textures
 	materialPtr->Render();
 
@@ -49,9 +55,13 @@ void Actor::BeginRender() {
 }
 
 void Actor::EndRender() {
-	mesh->Draw();
+	meshPtr->Draw();
 }
 
 Material* Actor::material() const {
 	return materialPtr.get();
+}
+
+Mesh* Actor::mesh() const {
+	return meshPtr.get();
 }

@@ -6,10 +6,6 @@
 #include <filesystem>
 #include <cstring>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "window.hpp"
 #include "controllers/camera.hpp"
 
@@ -21,6 +17,10 @@
 #include "ShaderFile.hpp"
 
 #include "scene/scene.hpp"
+
+#include "model_import/model_importer.hpp"
+#include "ui_utils/ui_transform.hpp"
+
 
 using namespace CEngine;
 
@@ -111,7 +111,7 @@ class MultipleLightsExercise : public Window {
             UpdateMouseLook();
         }
 
-        void HandleUI() {
+        virtual void HandleUI() {
             
             static float f = 0.0f;
             static bool show_demo_window = true,
@@ -119,10 +119,9 @@ class MultipleLightsExercise : public Window {
             static int counter = 0;
             static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            // Create a window called "Imported objects" and append into it.
+            ImGui::Begin("Window");              
+            
             ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
 
@@ -147,6 +146,8 @@ class MultipleLightsExercise : public Window {
                 ImGui::End();
             }
             
+            transformWnd.UpdateUI();
+
         }
 
         /**
@@ -236,9 +237,9 @@ class MultipleLightsExercise : public Window {
             material->SetUniform("emissionTexture", 2);
             
             // put here to make sure VAO's been binded
-            material->SetTexture(diffuseTex);
-            material->SetTexture(specularTex);
-            material->SetTexture(emissionTex);
+            //material->AddTexture(diffuseTex, "diffuseTexture");
+            //material->AddTexture(specularTex, "specularTexture");
+            //material->AddTexture(emissionTex, "emissionTexture");
             
             Logger::Log("Initializes the data =>");
 
@@ -258,6 +259,8 @@ class MultipleLightsExercise : public Window {
             mainScene.AddPointLight(pLight);
             mainScene.AddPointLight(pLight2);
             mainScene.AddPointLight(pLight3);
+
+            transformWnd.Context(cube);
         }
 
         void OnRenderLight(const Matrix4& view, const Matrix4& proj) {
@@ -313,11 +316,14 @@ class MultipleLightsExercise : public Window {
         }
     
     private:
-        std::shared_ptr<Actor> cube;
+        std::shared_ptr<Actor> cube, context;
         Scene mainScene;
         LightData light;
         CubeData cubeData;
         Camera mainCamera;
+
+        // ui...
+        UITransform transformWnd;
 
         const float cameraSpeed = 0.1f, sensitivity = 0.1f;
         const float LIGHT_RADIUS_ROT = 2, LIGHT_SPEED = 1, AMBIENT_FACTOR = 0.25f;

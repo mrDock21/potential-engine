@@ -128,12 +128,11 @@ bool Shader::OperationSucceded(uint shaderID) const {
 
 int Shader::GetUniformLocation(const std::string& uniform) {
     
-    return glGetUniformLocation(_ProgramID, uniform.c_str());
-    int location = uniforms[uniform];
-
-    if (uniforms.count(uniform) <= 0) {
-        location = glGetUniformLocation(_ProgramID, uniform.c_str());
-        uniforms[uniform] = location;
+    if (!uniforms.contains(uniform)) {
+        // ask OpenGL for the uniform in the shader...
+        uniforms[uniform] = 
+            glGetUniformLocation(_ProgramID, uniform.c_str());
     }
-    return location;
+
+    return uniforms[uniform];
 }

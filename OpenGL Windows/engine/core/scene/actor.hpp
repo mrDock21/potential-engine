@@ -43,10 +43,11 @@ namespace CEngine {
 		/// </summary>
 		void EndRender();
 
+		Mesh* mesh() const;
 		Material* material() const;
 
 	private:
-		std::unique_ptr<Mesh> mesh;
+		std::unique_ptr<Mesh> meshPtr;
 		std::unique_ptr<Material> materialPtr;
 	};
 }

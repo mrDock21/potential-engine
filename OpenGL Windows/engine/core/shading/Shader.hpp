@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <glad/glad.h>
 
 #include <glm/glm.hpp>
@@ -28,10 +28,10 @@ namespace CEngine {
         void SetUniform(const std::string&, const float&);
         void SetUniform(const std::string&, const int&);
 
-        void SetUniform(const std::string&, const Vector3&);
-        void SetUniform(const std::string&, const Vector4&);
-        void SetUniform(const std::string&, const Matrix4&);
-        void SetUniform(const std::string&, const Color&);
+        void SetUniform(const std::string&, const CEngine::Vector3&);
+        void SetUniform(const std::string&, const CEngine::Vector4&);
+        void SetUniform(const std::string&, const CEngine::Matrix4&);
+        void SetUniform(const std::string&, const CEngine::Color&);
 
         void SetUniform(const std::string&, const glm::vec2&);
         void SetUniform(const std::string&, const glm::vec3&);
@@ -45,7 +45,7 @@ namespace CEngine {
         int GetUniformLocation(const std::string&);
 
         uint _ProgramID;
-        std::map<std::string, int> uniforms;
+        std::unordered_map<std::string, int> uniforms;
     };
 }
 
