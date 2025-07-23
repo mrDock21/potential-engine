@@ -18,6 +18,8 @@ Actor::Actor(const std::string& name, Mesh* mPtr, Material* matPtr)
 
 void Actor::SetMesh(Mesh* m) {
 	// immplement OpenGL vertex update (in Mesh class)
+	meshPtr.reset();
+	meshPtr = std::unique_ptr<Mesh>(m);
 }
 
 void Actor::SetMaterial(Material* m) {

@@ -42,7 +42,8 @@ vec3 computePointLight(vec3 normal, PointLight pLight, vec3 viewDir, vec3 fragPo
 void main() {
 
 	// color combination
-	vec3 color, texColor = texture(diffuseTexture, texCoord).rgb;
+	vec4 fullColor = texture(diffuseTexture, texCoord);
+	vec3 color, texColor = fullColor.rgb;
 	// from frag to camera)
 	vec3 viewDir = normalize(vec3(0) - fragPos.xyz);
 	
@@ -54,7 +55,7 @@ void main() {
 		color += computePointLight(std_normal, lights[i], viewDir, fragPos.xyz);
 	}
 
-	FragColor = vec4(color, 1.0);
+	FragColor = vec4(color, fullColor.a);
 }
 
 vec3 computeDirectionalLight(vec3 normal, vec3 viewDir) {

@@ -21,7 +21,8 @@ add_subdirectory ("engine")
 # To compile a specific exercise: replace line 21
 add_executable (CMakeTarget 
 	# Only ONE exercise.CPP file should be here
-	"excercises/Model importing/ModelImporting_basic.cpp" 
+	# "excercises/Model importing/ModelImporting_basic.cpp" 
+	"excercises/Screen Effects/BlendingBasic.cpp"
 
 	#vendor files
 	# crosspplatform window

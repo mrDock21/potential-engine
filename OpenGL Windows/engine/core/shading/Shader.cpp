@@ -2,9 +2,11 @@
 
 using namespace CEngine;
 
-Shader::Shader() : _ProgramID(0) { }
+Shader::Shader() : _ProgramID(0), _type(Type::Opaque) { }
 
-Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc) {
+Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc) 
+    : _type(Type::Opaque) {
+
     uint vertexShader = CompileShader(vertexSrc, GL_VERTEX_SHADER),
          fragmentShader = CompileShader(fragSrc, GL_FRAGMENT_SHADER);
 
@@ -96,7 +98,8 @@ void Shader::SetUniform(const std::string& uniform, const glm::mat4x4& mat) {
 void Shader::BindShaderFlags() const {
     if (_type == Shader::Type::Transparent) {
         glEnable(GL_BLEND);
-        glBlendFunc(GL_FUNC_ADD, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquation(GL_FUNC_ADD);
     }
     // ToDo: immplement depth and stencil
 }
