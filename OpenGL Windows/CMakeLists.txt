@@ -41,11 +41,14 @@ add_executable (CMakeTarget
 
 # Add dynamic libs 
 target_link_directories (CMakeTarget PUBLIC vendor/glfw/lib-vc2022 vendor/assimp/lib)
-# Add libs & engine library 
-target_link_libraries (CMakeTarget glfw3_mt assimp-vc142-mtd engine)
+
 
 # ------IMPORTANT------
 # for Assimp, the DLL and PDB files MUST BE IN THE SAME FOLDER AS THE .EXE as well...
+#	and make sure that the Lib and DLL filenames match!!
+
+# Add libs & engine library 
+target_link_libraries (CMakeTarget glfw3_mt assimp-vc143-mtd engine)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET CMakeTarget PROPERTY CXX_STANDARD 20)

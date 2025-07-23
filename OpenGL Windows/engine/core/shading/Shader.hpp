@@ -17,11 +17,19 @@
 
 namespace CEngine {
 
+    class Material;
+
     class Shader {
     public:
+        
+        enum Type { Opaque, Transparent };
+
         Shader();
         Shader(const std::string&, const std::string&);
         void Use() const;
+        void BindShaderFlags() const;
+
+        void ShaderType(Type);
 
         void SetUniformBlock(const std::string&, const uint&);
 
@@ -37,6 +45,7 @@ namespace CEngine {
         void SetUniform(const std::string&, const glm::vec3&);
         void SetUniform(const std::string&, const glm::vec4&);
         void SetUniform(const std::string&, const glm::mat4x4&);
+
     private:
         uint CompileShader(const std::string&, uint) const;
         bool OperationSucceded() const;
@@ -45,6 +54,7 @@ namespace CEngine {
         int GetUniformLocation(const std::string&);
 
         uint _ProgramID;
+        Type _type;
         std::unordered_map<std::string, int> uniforms;
     };
 }

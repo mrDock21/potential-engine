@@ -56,7 +56,10 @@ void Material::AddTexture(const Texture& tex, const std::string& textureNameInSh
 }
 
 void Material::Render() const {
+    
     Use();
+    shader->BindShaderFlags();
+
     // bind each texture-set
     for (int i(0); i < textures.size(); i++) {
         // first: indicate set and then bind

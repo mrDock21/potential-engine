@@ -35,6 +35,7 @@ namespace CEngine {
         std::shared_ptr<Shader> InnerShader() const;
 
     private:
+        
         std::shared_ptr<Shader> shader;         // a material may share the shader with another
         std::vector<Texture> textures;          // each may have different textures...
 

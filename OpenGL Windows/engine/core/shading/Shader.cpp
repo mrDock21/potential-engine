@@ -30,6 +30,10 @@ void Shader::Use() const {
     glUseProgram(_ProgramID);
 }
 
+void Shader::ShaderType(Shader::Type type) {
+    _type = type;
+}
+
 void Shader::SetUniformBlock(const std::string& blockName, const uint& bindingIndex) {
     uint uniformBlock = glGetUniformBlockIndex(_ProgramID, blockName.c_str());
     glUniformBlockBinding(_ProgramID, uniformBlock, bindingIndex);
@@ -84,6 +88,17 @@ void Shader::SetUniform(const std::string& uniform, const glm::mat4x4& mat) {
     glUniformMatrix4fv(
         GetUniformLocation(uniform), 1, GL_FALSE, glm::value_ptr(mat)
     );
+}
+
+/// <summary>
+///     Enables blending, depth, and stencil flags if needed
+/// </summary>
+void Shader::BindShaderFlags() const {
+    if (_type == Shader::Type::Transparent) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_FUNC_ADD, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    // ToDo: immplement depth and stencil
 }
 
 uint Shader::CompileShader(const std::string& shaderSrc, uint shaderType) const {

@@ -84,4 +84,7 @@ void Mesh::Draw() const  {
         glDrawElements(GL_TRIANGLES, EBO.GetArraySize(), GL_UNSIGNED_INT, 0);
     else
         glDrawArrays(GL_TRIANGLES, 0, VBO.GetArrayCount());
+
+    // unbind whatever the shader enabled
+    glDisable(GL_BLEND | GL_STENCIL);
 }
