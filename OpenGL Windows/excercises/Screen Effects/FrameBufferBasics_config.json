@@ -24,6 +24,16 @@
   },
   "ScreenShader": {
     "Vertex": "Framebuffer basics/screen_vertex.shader",
-    "Frag": "Framebuffer basics/screen_frag_invert.shader"
+    "Frag": "Framebuffer basics/screen_frag_basic.shader"
+  },
+
+  "Internal Comments": {
+    "Other screenShader effects": [
+      "Framebuffer basics/screen_frag_blurr.shader",
+      "Framebuffer basics/screen_frag_invert.shader",
+      "Framebuffer basics/screen_frag_grayscale.shader",
+      "Framebuffer basics/screen_frag_sharpen.shader",
+      "Framebuffer basics/screen_frag_edge-detect.shader"
+    ]
   }
 }
