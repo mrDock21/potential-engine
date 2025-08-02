@@ -20,22 +20,27 @@ namespace CEngine {
     }
 
     namespace Assets {
-        std::string GetRootFolder(const std::string& asset) {
+        inline std::string GetRootFolder(const std::string& asset) {
             return "./../../../../" + asset;
         }
 
-        std::string GetShaderPath(const std::string& asset) {
+        inline std::string GetShaderPath(const std::string& asset) {
             return "./../../../../Shaders/" + asset;
         }
 
-        std::string GetAssetPath(const std::string& asset) {
+        inline std::string GetAssetPath(const std::string& asset) {
             return "./../../../../assets/" + asset;
         }
 
-        std::string GetShaderCode(std::string file) {
-            ShaderFile s(file);
+        std::string GetShaderCode(std::string shaderFilename) {
+            std::string assetPath = GetShaderPath(shaderFilename);
+            ShaderFile s(assetPath);
 
             return s.Code();
+        }
+
+        inline std::string GetConfigFilePath(const std::string& configFilename) {
+            return "./../../../../OpenGL Windows/excercises/" + configFilename;
         }
     }
 }

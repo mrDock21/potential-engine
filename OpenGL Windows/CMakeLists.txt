@@ -10,6 +10,7 @@ include_directories(
 	"vendor/glm/" 
 	"vendor/imgui/" 
 	"vendor/imgui/backend/"
+	"vendor/nlohmann/"
 	"vendor/" 
 	"engine/core/" 
 	"engine/utils/" 

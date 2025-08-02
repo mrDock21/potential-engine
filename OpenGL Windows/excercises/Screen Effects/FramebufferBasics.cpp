@@ -6,6 +6,9 @@
 #include <filesystem>
 #include <cstring>
 
+#include <iomanip>
+#include <nlohmann/json.hpp>
+
 #include "window.hpp"
 #include "controllers/camera.hpp"
 
@@ -27,17 +30,21 @@
 
 using namespace CEngine;
 
+using json = nlohmann::json;
+
 /**
  * Compile this with cmake (in root folder)
 */
 
 class Framebuffer_Basics : public Window {
 public:
-    Framebuffer_Basics(const std::string& wnd, const int& w, const int h)
+    Framebuffer_Basics(const std::string& wnd, const int& w, const int h, const json& jsonConfig)
         : Window(wnd, w, h), mainCamera()
     {
+        RetrieveSettings(jsonConfig);
+
         screenFrameBuffer = std::make_unique<FrameBufferQuad>(
-            w, h, new Shader(SCREEN_SRC_VERTEX, SCREEN_SRC_FRAG)
+            w, h, new Shader(settings.ScreenShaderVertex, settings.ScreenShaderFrag)
         );
 
         // init scene
@@ -48,18 +55,38 @@ public:
         std::cout << "[Framebuffer_Basics::FreesMemory]" << std::endl;
     }
 
+    void RetrieveSettings(const json& jsonConfig) {
+
+        settings.CamFOV = jsonConfig["CameraSettings"]["FOV"];
+        settings.CamMovementSpeed = jsonConfig["CameraSettings"]["MovementSpeed"];
+        settings.CamLookSpeed = jsonConfig["CameraSettings"]["LookSpeed"];
+        settings.CamNear = jsonConfig["CameraSettings"]["NearPlane"];
+        settings.CamFar = jsonConfig["CameraSettings"]["FarPlane"];
+
+        settings.BunnyModelPath = Assets::GetAssetPath(jsonConfig["ModelAssets"]["Model3D"]);
+        settings.BunnyTexturePath = Assets::GetAssetPath(jsonConfig["ModelAssets"]["BunnyTexture"]);
+        
+        settings.WindowTexturePath = Assets::GetAssetPath(jsonConfig["ModelAssets"]["WindowTexture"]);
+    
+        settings.ModelShaderVertex = Assets::GetShaderCode(jsonConfig["ModelShader"]["Vertex"]);
+        settings.ModelShaderFrag = Assets::GetShaderCode(jsonConfig["ModelShader"]["Frag"]);
+
+        settings.ScreenShaderVertex = Assets::GetShaderCode(jsonConfig["ScreenShader"]["Vertex"]);
+        settings.ScreenShaderFrag = Assets::GetShaderCode(jsonConfig["ScreenShader"]["Frag"]);
+    }
+
     void UpdateMouseLook() {
         Vector3 rot(0.0f);
         // jaw
         if (Input::PressedLEFT())
-            rot.SetY(360.0f * Time::deltaTime * sensitivity);
+            rot.SetY(360.0f * Time::deltaTime * settings.CamLookSpeed);
         if (Input::PressedRIGHT())
-            rot.SetY(-360.0f * Time::deltaTime * sensitivity);
+            rot.SetY(-360.0f * Time::deltaTime * settings.CamLookSpeed);
         // pitch
         if (Input::PressedUP())
-            rot.SetX(360.0f * Time::deltaTime * sensitivity);
+            rot.SetX(360.0f * Time::deltaTime * settings.CamLookSpeed);
         if (Input::PressedDOWN())
-            rot.SetX(-360.0f * Time::deltaTime * sensitivity);
+            rot.SetX(-360.0f * Time::deltaTime * settings.CamLookSpeed);
 
         mainCamera.RotateYaw(rot.Y());
         mainCamera.RotatePitch(rot.X());
@@ -80,7 +107,7 @@ public:
             // move right
             dir = mainCamera.Transform().Right();
 
-        mainCamera.Move(dir * Time::deltaTime);
+        mainCamera.Move(settings.CamMovementSpeed * dir * Time::deltaTime);
 
         if (Input::PressedESC())
             Close();
@@ -93,9 +120,6 @@ public:
         transformWnd.UpdateUI();
     }
 
-    /**
-     * Excercise is to create basic phong lighting in view space
-    */
     void OnMainLoopInit() {
         // enable ZTest buffering!
         Enable(WndBuffer::Depth);
@@ -113,15 +137,17 @@ public:
     // static version
     void ImportModel() {
         ModelImporter importer;
-        std::shared_ptr<Shader> shader = std::make_shared<Shader>(SRC_VERTEX, SRC_FRAG);
-        std::shared_ptr<Texture> diffuseTex =
-            std::make_shared<Texture>(DIFFUSE_MAP, Texture::ImgType::JPEG);
+        auto shader = 
+            std::make_shared<Shader>(settings.ModelShaderVertex, settings.ModelShaderFrag);
+        auto diffuseTex =
+            std::make_shared<Texture>(settings.BunnyTexturePath, Texture::ImgType::JPEG);
 
         // enable ZTest buffering!
         Enable(WndBuffer::Depth);
         // import the model
         importer.BaseShader(shader);
-        importer.Import(MODEL_PATH);
+        importer.Import(settings.BunnyModelPath);
+
         // retrieve the data
         for (Actor* actor : importer.Data()) {
             // to bind with current VAO
@@ -152,10 +178,11 @@ public:
     }
 
     void CreateQuad() {
-        std::shared_ptr<Texture> windowTex =
-            std::make_shared<Texture>(WINDOW_DIFFUSE_MAP, Texture::ImgType::PNG);
+        auto windowTex =
+            std::make_shared<Texture>(settings.WindowTexturePath, Texture::ImgType::PNG);
+        auto shader = 
+            std::make_shared<Shader>(settings.ModelShaderVertex, settings.ModelShaderFrag);
         Material* newMat;
-        auto shader = std::make_shared<Shader>(SRC_VERTEX, SRC_FRAG);
 
         shader->ShaderType(Shader::Type::Transparent);
         newMat = new Material(shader);
@@ -174,7 +201,9 @@ public:
         // transformations
         Matrix4 proj, view = mainCamera.GetViewMatrix();
 
-        proj = Matrix4::Perspective(45.0f, (float)GetAspectRatio(), 0.1f, 100.0f);
+        proj = Matrix4::Perspective(
+            settings.CamFOV, (float)GetAspectRatio(), settings.CamNear, settings.CamFar
+        );
 
         screenFrameBuffer->UseAsRenderTarget();
         // render to screen texture
@@ -188,53 +217,50 @@ public:
 private:
     Scene mainScene;
     Camera mainCamera;
+    // post-processing effects
     std::unique_ptr<FrameBufferQuad> screenFrameBuffer;
 
     // ui...
     UITransform transformWnd;
 
-    const float cameraSpeed = 0.1f, sensitivity = 0.1f;
-    const float LIGHT_RADIUS_ROT = 2, LIGHT_SPEED = 1, AMBIENT_FACTOR = 0.25f;
+    // config file settings
+    struct Settings {
+        int CamFOV;   
+        float CamNear, CamFar, CamLookSpeed, CamMovementSpeed;
 
-    // NOTE: these paths are relative to the 
-    //  console's location, which is in the "out/..." folder!!!
+        std::string BunnyModelPath, ModelShaderVertex, ModelShaderFrag;
 
-    // shaders for models...
-    const std::string SRC_VERTEX = Assets::GetShaderCode(
-        Assets::GetShaderPath("MultipleLights_Vertex.shader")
-    ),
-        SRC_FRAG = Assets::GetShaderCode(
-            Assets::GetShaderPath("Model importing/MIBasic.shader")
-        );
-    // shaders for the screen...
-    const std::string SCREEN_SRC_VERTEX = Assets::GetShaderCode(
-        Assets::GetShaderPath("Framebuffer basics/screen_vertex.shader")
-    ),
-        SCREEN_SRC_FRAG = Assets::GetShaderCode(
-            //Assets::GetShaderPath("Framebuffer basics/screen_frag_basic.shader")
-            Assets::GetShaderPath("Framebuffer basics/screen_frag_invert.shader")
-        );
-    
-    // model
-    const std::string MODEL_PATH = Assets::GetAssetPath("stanford-bunny/model.dae");
-    // textures
-    const std::string DIFFUSE_MAP =
-        Assets::GetAssetPath("stanford-bunny/textures/DefaultMaterial_diffuse.jpg");
-    const std::string WINDOW_DIFFUSE_MAP =
-        Assets::GetAssetPath("blending_transparent_window.png");
+        std::string BunnyTexturePath, WindowTexturePath;
+
+        std::string ScreenShaderVertex, ScreenShaderFrag;
+
+    } settings;
 
 };
 
 
+// NOTE: file paths are relative to the 
+//  console's location, which is in the "out/..." folder!!!
+
 int main() {
+    std::ifstream jsonFile(
+        Assets::GetConfigFilePath("Screen Effects/FrameBufferBasics_config.json")
+    );
+    json configData = json::parse(jsonFile);
 
     std::cout << "Current PATH => " << std::filesystem::current_path() << std::endl;
 
-    Framebuffer_Basics wnd("LearnOpenGL => Importing model", 800, 600);
+    Framebuffer_Basics wnd(
+        configData["Window"]["Name"], 
+        configData["Window"]["Width"], 
+        configData["Window"]["Height"], 
+        configData
+    );
 
     // init random seed
     srand(time(nullptr));
 
     wnd.MainLoop();
+
     return 0;
 }
