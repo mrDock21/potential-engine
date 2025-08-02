@@ -20,6 +20,7 @@
 #include "controllers/input.hpp"
 #include "controllers/time.hpp"
 #include "types/types.hpp"
+#include "frame_buffers/frame_buffer_quad.hpp"
 
 #include "controllers/window_context.hpp"
 

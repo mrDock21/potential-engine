@@ -8,6 +8,7 @@
 
 namespace CEngine {
 
+
     class Texture {
         public:
             enum class TexFormat { R, RG, RGB, RGBA };
@@ -23,7 +24,15 @@ namespace CEngine {
             Texture(const std::string&, const TexFormat&, const PixelFormat&);
             // Create and read texture by specific image type
             Texture(const std::string&, const ImgType&);
+            // Create an EMPTY texture with specific image type
+            Texture(int, int, const TexFormat&, const PixelFormat&);
+
+            ~Texture();
+
             void Use() const;
+
+            friend class FrameBuffer;
+
         private:
             uint ID;
             int width, height;

@@ -29,5 +29,8 @@ set (CORE_FILES
 	core/scene/scene.cpp 
 	core/model_import/vertex.cpp 
 	core/model_import/model_importer.cpp 
- "core/ui_utils/ui_transform.cpp")
+	core/ui_utils/ui_transform.cpp
+	core/frame_buffers/frame_buffer.cpp
+	core/frame_buffers/render_buffer.cpp 
+	core/frame_buffers/frame_buffer_quad.cpp)
 add_library (engine ${CORE_FILES})

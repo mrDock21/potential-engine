@@ -22,6 +22,23 @@ Texture::Texture(const std::string& imgName, const ImgType& imgType) {
     }
 }
 
+Texture::Texture(int w, int h, const TexFormat& format, const PixelFormat& pxlFormat) {
+    
+    const u_char* emptyImg = nullptr;
+    
+    this->pixelFormat = pxlFormat;
+    this->format = format;
+    width = w;
+    height = h;
+
+    GenerateTexture(emptyImg);
+
+}
+
+Texture::~Texture() {
+    glDeleteTextures(1, &ID);
+}
+
 void Texture::Use() const {
     glBindTexture(GL_TEXTURE_2D, ID);
 }

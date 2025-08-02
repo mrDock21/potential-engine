@@ -43,13 +43,13 @@ void Material::SetUniformBlock(const UBO& ubo) {
     linkedUniformBlocks.push_back(ubo.ID());
 }
 
-void Material::AddTexture(const Texture& tex, const std::string& textureNameInShader) {
+void Material::AddTexture(std::shared_ptr<Texture> tex, const std::string& textureNameInShader) {
     int textureIndex = textures.size();
     // to bind with current VAO and material
     Use();
     // bind image with texture set 0 + N
     glActiveTexture(GL_TEXTURE0 + textureIndex);
-    tex.Use();
+    tex->Use();
     // connect the texture set and the uniform in the shader 
     SetUniform(textureNameInShader, textureIndex);
     textures.push_back(tex);
@@ -64,7 +64,7 @@ void Material::Render() const {
     for (int i(0); i < textures.size(); i++) {
         // first: indicate set and then bind
         glActiveTexture(GL_TEXTURE0 + i);
-        textures.at(i).Use();
+        textures.at(i)->Use();
     }
 }
 

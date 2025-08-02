@@ -17,14 +17,16 @@ namespace CEngine {
     public:
         Material();
         Material(std::shared_ptr<Shader>);
+        // Create with Vertex and Fragment code directly
         Material(const std::string&, const std::string&);
+
         void Use() const;
         void Render() const;
 
         void SetShader(std::shared_ptr<Shader>);
         void SetUniformBlock(const UBO&);
 
-        void AddTexture(const Texture&, const std::string&);
+        void AddTexture(std::shared_ptr<Texture>, const std::string&);
         void SetUniform(const std::string&, const int&);
         void SetUniform(const std::string&, const float&);
         void SetUniform(const std::string&, const Vector3&);
@@ -36,8 +38,10 @@ namespace CEngine {
 
     private:
         
-        std::shared_ptr<Shader> shader;         // a material may share the shader with another
-        std::vector<Texture> textures;          // each may have different textures...
+        // a material may share the shader with another
+        std::shared_ptr<Shader> shader;         
+        // each may have different textures...
+        std::vector< std::shared_ptr<Texture> > textures;          
 
         std::vector<uint> linkedUniformBlocks;  // linked uniforms
     };
