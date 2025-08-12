@@ -17,7 +17,11 @@ namespace CEngine {
     public:
         Material();
         Material(std::shared_ptr<Shader>);
-        // Create with Vertex and Fragment code directly
+        /**
+         * Initializes material with given shader src
+         * @param vertexSrc Source code of vertex shader
+         * @param fragSrc Source code of fragment shader
+        */
         Material(const std::string&, const std::string&);
 
         void Use() const;

@@ -9,9 +9,8 @@ Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc)
 
     uint vertexShader = CompileShader(vertexSrc, GL_VERTEX_SHADER),
          fragmentShader = CompileShader(fragSrc, GL_FRAGMENT_SHADER);
-
+    
     if (vertexShader == 0 || fragmentShader == 0) {
-        std::cout << "[SHADER-COMPILE-ERROR] Couldn't compile shader source!" << std::endl;
         _ProgramID = 0;
         return;
     }
@@ -111,8 +110,11 @@ uint Shader::CompileShader(const std::string& shaderSrc, uint shaderType) const 
     glShaderSource(id, 1, &src, NULL);
     glCompileShader(id);
 
-    if (!OperationSucceded(id))
+    if (!OperationSucceded(id)) {
+        Logger::Warning("-----Shader-COMPILE-ERROR= Couldn't compile:");
+        Logger::Warning(shaderSrc);
         return 0;
+    }
     return id;
 }
 
@@ -138,7 +140,8 @@ bool Shader::OperationSucceded(uint shaderID) const {
 
     if (!success) {
         glGetShaderInfoLog(shaderID, sizeof(infolog), NULL, infolog);
-        std::cout << "[SHADER-COMPILATION-ERROR] " << infolog << std::endl;
+        Logger::Warning("\n-----Shader-LOG");
+        Logger::Warning(std::string(infolog));
         return false;
     }
     return true;

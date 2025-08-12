@@ -24,7 +24,9 @@ add_executable (CMakeTarget
 	# Only ONE exercise.CPP file should be here
 	# "excercises/Model importing/ModelImporting_basic.cpp" 
 	# "excercises/Screen Effects/BlendingBasic.cpp"
-	"excercises/Screen Effects/FramebufferBasics.cpp"
+	# "excercises/Screen Effects/FramebufferBasics.cpp"
+	# "excercises/Screen Effects/FramebufferRearView.cpp"
+	"excercises/Screen Effects/skybox_Basic.cpp"
 
 	#vendor files
 	# crosspplatform window
@@ -37,7 +39,7 @@ add_executable (CMakeTarget
 	"vendor/imgui/backend/imgui_impl_glfw.cpp"
 	"vendor/imgui/backend/imgui_impl_opengl3.cpp"
 	"vendor/imgui/backend/imgui_stdlib.cpp"
- )
+)
 # If intellisense breaks, go to Visual studio menu (to regenerate): 
 #	Proyect => Configure OpenGL Windows
 

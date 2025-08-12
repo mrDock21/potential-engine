@@ -1,0 +1,57 @@
+{
+  "Exercise": "Skybox Basic",
+
+  "Window": {
+    "Width": 800,
+    "Height": 600,
+    "Name": "LearnOpenGL => Skybox Basic"
+  },
+
+  "CameraSettings": {
+    "FOV": 45.0,
+    "MovementSpeed": 1.0,
+    "LookSpeed": 0.1,
+    "NearPlane": 0.1,
+    "FarPlane": 100.0
+  },
+
+  "ModelAssets": {
+    "Model3D": "stanford-bunny/model.dae",
+    "BunnyTexture": "stanford-bunny/textures/DefaultMaterial_diffuse.jpg",
+    "WindowTexture": "blending_transparent_window.png"
+  },
+
+  "ModelShader": {
+    "Vertex": "MultipleLights_Vertex.shader",
+    "Frag": "Model importing/MIBasic.shader"
+  },
+
+  "ScreenShader": {
+    "Vertex": "Framebuffer basics/screen_vertex.shader",
+    "Frag": "Framebuffer basics/screen_frag_basic.shader"
+  },
+
+  "SkyboxTextures": [
+    "skybox/right.jpg",
+    "skybox/left.jpg",
+    "skybox/top.jpg",
+    "skybox/bottom.jpg",
+    "skybox/front.jpg",
+    "skybox/back.jpg"
+  ],
+  "SkyboxShader": {
+    "Vertex": "Skyboxes/skybox_vertex.shader",
+    "Frag": "Skyboxes/skybox_frag.shader"
+  },
+
+  "Internal Comments": {
+    "Other screenShader effects": [
+      "Framebuffer basics/screen_frag_blurr.shader",
+      "Framebuffer basics/screen_frag_invert.shader",
+      "Framebuffer basics/screen_frag_grayscale.shader",
+      "Framebuffer basics/screen_frag_sharpen.shader",
+      "Framebuffer basics/screen_frag_edge-detect.shader",
+      "Framebuffer basics/screen_frag_basic.shader"
+    ]
+  }
+}

@@ -18,6 +18,7 @@ set (CORE_FILES
 	core/math_types/quaternion.cpp
 	utils/ShaderFile.cpp 
 	utils/Logger.cpp
+	utils/stb_img_loader.cpp
 	core/controllers/time.cpp 
 	core/scene/object.cpp
 	core/types/color.cpp 
@@ -32,5 +33,7 @@ set (CORE_FILES
 	core/ui_utils/ui_transform.cpp
 	core/frame_buffers/frame_buffer.cpp
 	core/frame_buffers/render_buffer.cpp 
-	core/frame_buffers/frame_buffer_quad.cpp)
+	core/frame_buffers/frame_buffer_quad.cpp 
+	core/shading/cube_map.cpp
+)
 add_library (engine ${CORE_FILES})

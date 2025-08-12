@@ -39,6 +39,16 @@ namespace CEngine {
             return s.Code();
         }
 
+        //  Returns vector of complete paths for each file in @filesNames
+        std::vector<std::string> GetFilePaths(const std::vector<std::string>& filesNames) {
+            std::vector<std::string> v;
+
+            for (std::string file : filesNames)
+                v.push_back( GetAssetPath(file) );
+
+            return v;
+        }
+
         inline std::string GetConfigFilePath(const std::string& configFilename) {
             return "./../../../../OpenGL Windows/excercises/" + configFilename;
         }

@@ -15,6 +15,8 @@
 
 #include "types/color.hpp"
 
+#include "Logger.hpp"
+
 namespace CEngine {
 
     class Material;

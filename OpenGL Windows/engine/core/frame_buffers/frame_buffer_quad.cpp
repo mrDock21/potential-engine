@@ -12,21 +12,37 @@ FrameBufferQuad::FrameBufferQuad(int texWidth, int texHeight, Shader* const scre
 	quadMaterial->Use();
 }
 
+FrameBufferQuad::FrameBufferQuad(
+	int texW, int texH, Shader* const screenShader, float verts_uvs[], u_long arrSize
+) {
+	initBuffers(texW, texH, screenShader);
+
+	initQuadMesh(verts_uvs, arrSize);
+
+	// bind them together...
+	quad->Use();
+	quadMaterial->Use();
+}
+
 void FrameBufferQuad::UseAsRenderTarget() const {
 
 	framebufferPtr->UseAsRenderTarget();
+	// clear everything from *this framebuffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 }
 
 //	Moves rendered texture to the Quad's shader and draws it as a plane 
 //  [NOTE] scene should have been rendered already
-void FrameBufferQuad::RenderQuad() const {
+void FrameBufferQuad::RenderQuad(bool shouldClearDefaultBuffer) const {
 
 	framebufferPtr->Unbind();
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (shouldClearDefaultBuffer)
+		// will delete everything in the screen
+		glClear(GL_COLOR_BUFFER_BIT);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -69,7 +85,7 @@ void FrameBufferQuad::initBuffers(int texWidth, int texHeight, Shader* const scr
 }
 
 void FrameBufferQuad::initQuadMesh() {
-
+	// use default quad (whole screen)
 	float quadVertices[] = {
 		// positions // texCoords
 		-1.0f, 1.0f, 0.0f, 1.0f,
@@ -80,12 +96,17 @@ void FrameBufferQuad::initQuadMesh() {
 		1.0f,-1.0f,  1.0f, 0.0f,
 		1.0f, 1.0f,  1.0f, 1.0f
 	};
+	
+	initQuadMesh( quadVertices, sizeof(quadVertices) );
+}
+
+void FrameBufferQuad::initQuadMesh(float verts[], u_long arrSize) {
 	const u_long componentsSize = sizeof(float) * 4;
 	const int posAttrIndex(0), uvAttrIndex(1), attrSize(2);
 	const bool shouldBeNormalized(false);
 	const float uvLocOffset = 2 * sizeof(float);
 
-	quad = std::make_unique<Mesh>(quadVertices, sizeof(quadVertices), componentsSize);
+	quad = std::make_unique<Mesh>(verts, arrSize, componentsSize);
 
 	quad->Use();
 	quad->SetAttribute(

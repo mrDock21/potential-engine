@@ -1,8 +1,5 @@
 #include "Texture.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "./../../../vendor/stb_image.h"
-
 using namespace CEngine;
 
 Texture::Texture() { }
@@ -47,23 +44,17 @@ void Texture::Use() const {
 ///     Will read the texture (image) file
 /// </summary>
 void Texture::Init(const std::string& imgName, const TexFormat& format, const PixelFormat& pxlFormat) {
-    int numChannels;
-    u_char* data;
-
-    stbi_set_flip_vertically_on_load(true);
-    // read image
-    data = stbi_load(imgName.c_str(), &width, &height, &numChannels, 0);
     
-    if (data) {
-        this->pixelFormat = pxlFormat;
-        this->format = format;
-        GenerateTexture(data);
-        
-        stbi_image_free(data);
-    }
-    else
-        std::cout << "TEXTURE::ERROR::Couldn't read texture: " << imgName << std::endl;
+    STBImageLoader imgLoader;
 
+    imgLoader.LoadTexture(imgName, &width, &height);
+    
+    if (imgLoader.Data() == nullptr)
+        Logger::Warning("---TEXTURE::ERROR::Cancelled: ");
+
+    this->pixelFormat = pxlFormat;
+    this->format = format;
+    GenerateTexture( imgLoader.Data() );
 }
 
 /// <summary>

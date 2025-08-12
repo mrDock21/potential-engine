@@ -4,7 +4,7 @@
 
 #include "types/types.hpp"
 
-#include "Logger.hpp"
+#include "stb_img_loader.hpp"
 
 namespace CEngine {
 
