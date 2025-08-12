@@ -24,7 +24,7 @@ namespace CEngine {
     class Shader {
     public:
         
-        enum class Type { Opaque, Transparent };
+        enum class Type { Opaque = 0, Transparent };
 
         Shader();
         ~Shader();

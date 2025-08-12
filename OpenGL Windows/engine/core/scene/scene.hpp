@@ -11,6 +11,7 @@
 #include "controllers/camera.hpp"
 
 #include "shading/uniform_buffer.hpp"
+#include "shading/cube_map.hpp"
 
 namespace CEngine {
 
@@ -29,9 +30,9 @@ namespace CEngine {
 		~Scene();
 
 		void AddPointLight(std::shared_ptr<PointLight>);
+		void AddActor(std::shared_ptr<Actor>);
 		void AddObject(std::shared_ptr<Object>);
 		void RemoveActor(Actor*);
-		void RemoveActor(int);
 
 		/// <summary>
 		///		Initializes the uniform buffer for camera (matrix), and projection (matrix)
@@ -43,6 +44,7 @@ namespace CEngine {
 		/// </summary>
 		/// <param name="">	Window's aspect ratio	</param>
 		void Render(const Matrix4&, const Matrix4&);
+		void Render(const Matrix4&, const Matrix4&, CubeMap* const);
 
 		std::shared_ptr<Object> GetChild(const int&);
 
@@ -57,9 +59,9 @@ namespace CEngine {
 		};
 
 		uint innerCount, lightCount;
-		std::vector<SceneObject> actors;
+		std::vector<SceneObject> opaqueActors, transparentActors;
 
-		Light* lights[10];
+		std::shared_ptr<Light> lights[10];
 		DirectionalLight sun;
 
 		UBO globalMatricesBuffer, globalLightsBuffer;

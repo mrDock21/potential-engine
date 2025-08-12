@@ -10,20 +10,33 @@ Scene::Scene() : innerCount(0), lightCount(0) {
 }
 
 Scene::~Scene() {
-	actors.clear();
+
+	opaqueActors.clear();
+	transparentActors.clear();
 }
 
 void Scene::AddPointLight(std::shared_ptr<PointLight> plight) {
-	
-	lights[lightCount] = plight.get();
-	lightCount++;
 
-	AddObject(plight);
+	plight->Initialize(globalMatricesBuffer, globalLightsBuffer);
+	
+	lights[lightCount] = plight;
+	lightCount++;
+}
+
+void Scene::AddActor(std::shared_ptr<Actor> actor) {
+	
+	innerCount++;
+	actor->Initialize(globalMatricesBuffer, globalLightsBuffer);
+
+	if (actor->material()->InnerShader()->GetType() == Shader::Type::Opaque)
+		opaqueActors.push_back({ innerCount, actor });
+	else
+		transparentActors.push_back({ innerCount, actor });
 }
 
 void Scene::AddObject(std::shared_ptr<Object> obj) {
 	std::shared_ptr<Object> ptr(obj);
-	actors.push_back({ 
+	opaqueActors.push_back({ 
 		innerCount++, std::move(ptr)
 	});
 
@@ -34,16 +47,17 @@ void Scene::AddObject(std::shared_ptr<Object> obj) {
 void Scene::RemoveActor(Actor* obj) {
 	
 	int index(0);
+	std::vector<SceneObject> *actors;
+	Shader::Type shaderType = obj->material()->InnerShader()->GetType();
 
-	for (auto i(actors.begin()); i != actors.end(); i++, index++) {
+	actors = (shaderType == Shader::Type::Opaque) ? 
+		&opaqueActors : &transparentActors;
+
+	for (auto i(actors->begin()); i != actors->end(); i++, index++) {
 		if (i->Obj.get() == obj)
 			break;
 	}
-	RemoveActor(index);
-}
-
-void Scene::RemoveActor(int index) {
-	actors.erase(actors.begin() + index);
+	actors->erase(actors->begin() + index);
 }
 
 void Scene::InitializeGlobalData() {
@@ -67,10 +81,15 @@ void Scene::InitializeGlobalData() {
 
 void Scene::Render(const Matrix4& view, const Matrix4& proj) {
 
+	Render(view, proj, nullptr);
+}
+
+void Scene::Render(const Matrix4& view, const Matrix4& proj, CubeMap* const sky) {
+
 	// update View matrix
 	// since it's the first, we set offset to 0
 	globalMatricesBuffer.Upload(view, 0);
-	
+
 	// update (perspective) Projection matrix
 	// since the 'view' matrix is before this one, the offset is different
 	globalMatricesBuffer.Upload(proj, Matrix4::Size());
@@ -79,13 +98,37 @@ void Scene::Render(const Matrix4& view, const Matrix4& proj) {
 	UpdateLights();
 	UpdateSun();
 
-	for (int i(0); i < actors.size(); i++) {
-		actors.at(i).Obj->Render();
+	// Opaque rendering 
+	for (auto actor : opaqueActors) {
+		actor.Obj->Render();
 	}
+
+	if (sky != nullptr)
+		sky->Render(view, proj);
+
+	// Opaque rendering 
+	for (auto actor : transparentActors) {
+		actor.Obj->Render();
+	}
+
+	// Transparent objects rendering 
 }
 
 std::shared_ptr<Object> Scene::GetChild(const int& i) {
-	return actors.at(i).Obj;
+
+	for (int j(0); j < opaqueActors.size(); j++) {
+
+		if (j == i)
+			return opaqueActors.at(j).Obj;
+
+	}
+	for (int j(0), k(opaqueActors.size()); j < transparentActors.size(); j++) {
+
+		if (k == i)
+			return opaqueActors.at(j).Obj;
+		k++;
+	}
+	return nullptr;
 }
 
 void Scene::UpdateLights() {

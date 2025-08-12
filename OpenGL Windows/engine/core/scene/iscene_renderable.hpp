@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./../shading/uniform_buffer.hpp"
+#include "./../shading/material.hpp"
 
 namespace CEngine {
 

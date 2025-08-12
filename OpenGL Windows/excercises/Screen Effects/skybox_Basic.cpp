@@ -151,7 +151,7 @@ public:
 
         CreateLights();
 
-        CreateQuad();
+        CreateWindowQuad();
 
         // link UI controls to the model
         transformWnd.Context(mainScene.GetChild(0));
@@ -164,7 +164,6 @@ public:
         skyMat = std::make_shared<Material>(
             settings.SkyboxShaderVertex, settings.SkyboxShaderFrag
         );
-        skyMat->SetCullingMode(Material::CullingMode::Back);
 
         backgroundSkybox = std::make_unique<CubeMap>(settings.SkyBoxImgs);
         backgroundSkybox->Skybox(skyMat);
@@ -191,7 +190,7 @@ public:
             actor->mesh()->Use();
             actor->material()->AddTexture(diffuseTex, "diffuseTexture");
             std::shared_ptr<Actor> a(actor);
-            mainScene.AddObject(a);
+            mainScene.AddActor(a);
         }
     }
 
@@ -212,7 +211,7 @@ public:
         mainScene.AddPointLight(pLight3);
     }
 
-    void CreateQuad() {
+    void CreateWindowQuad() {
         auto windowTex =
             std::make_shared<Texture>(settings.WindowTexturePath, Texture::ImgType::PNG);
         auto shader = 
@@ -228,7 +227,7 @@ public:
 
         newQuad->Transform().Position(Vector3(0, 0, -0.5));
 
-        mainScene.AddObject(newQuad);
+        mainScene.AddActor(newQuad);
 
     }
 
@@ -244,8 +243,7 @@ public:
         screenFrameBuffer->UseAsRenderTarget();
 
         // render the whole scene to screen texture
-        mainScene.Render(view, proj);
-        backgroundSkybox->Render(view, proj);
+        mainScene.Render(view, proj, backgroundSkybox.get());
 
         // display the final from framebuffer
         screenFrameBuffer->RenderQuad( shouldNotClearColors );
