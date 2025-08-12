@@ -123,7 +123,13 @@ public:
         if (Input::PressedD())
             // move right
             dir = mainCamera.Transform().Right();
-
+        if (Input::PressedQ())
+            // move up
+            dir = Vector3::Up();
+        if (Input::PressedE())
+            // move down
+            dir = -Vector3::Up();
+            
         mainCamera.Move(settings.CamMovementSpeed * dir * Time::deltaTime);
 
         if (Input::PressedESC())
@@ -158,6 +164,7 @@ public:
         skyMat = std::make_shared<Material>(
             settings.SkyboxShaderVertex, settings.SkyboxShaderFrag
         );
+        skyMat->SetCullingMode(Material::CullingMode::Back);
 
         backgroundSkybox = std::make_unique<CubeMap>(settings.SkyBoxImgs);
         backgroundSkybox->Skybox(skyMat);

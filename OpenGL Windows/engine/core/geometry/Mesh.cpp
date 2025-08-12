@@ -2,7 +2,17 @@
 
 using namespace CEngine;
 
-Mesh::Mesh() { }
+Mesh::Mesh() : VBO(nullptr), EBO(nullptr) { 
+
+    // vertex array object
+    glGenVertexArrays(1, &VAO);
+}
+
+Mesh::~Mesh() {
+
+    // vertex array object
+    glDeleteVertexArrays(1, &VAO);
+}
 
 /**
  * Constructs mesh with vertex buffer only
@@ -10,13 +20,14 @@ Mesh::Mesh() { }
  * @param vertsSize Size in bytes of data array
  * @param esize Size in bytes of all attributes contained in data (vertex, normal, uv...)
 */
-Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize) : usesEBO(false) {
-    // vertex array object
-    glGenVertexArrays(1, &VAO);
+Mesh::Mesh(float verts[], const u_long& vertsSize, const u_long& esize) : Mesh() {
+    
     Use();
     // vertex buffer
-    VBO = VertexBuffer(verts, vertsSize, esize, BufferUsage::Static);
-    VBO.Use();
+    VBO = std::make_unique<VertexBuffer>(
+        verts, vertsSize, esize, BufferUsage::Static
+    );
+    VBO->Use();
 }
 
 /**
@@ -28,22 +39,22 @@ Mesh::Mesh(float* verts, const u_long& vertsSize, const u_long& esize) : usesEBO
  * @param indicesSize Size in bytes of indices array
 */
 Mesh::Mesh(
-    float* verts, 
+    float verts[],
     const u_long& vertsSize, 
     const u_long& esize, 
-    uint* indices, 
+    uint indices[],
     const u_long& indicesSize
-) : usesEBO(true) {
-    // vertex array object
-    glGenVertexArrays(1, &VAO);
+) : Mesh(verts, vertsSize, esize) {
+    
     Use();
-    // vertex buffer
-    VBO = VertexBuffer(verts, vertsSize, esize, BufferUsage::Static);
-    VBO.Use();
+    VBO->Use();
+
     // elements (index) buffer
     // element array object -> Gets binded to current VAO
-    EBO = ElementBuffer(indices, indicesSize, BufferUsage::Static);
-    EBO.Use();
+    EBO = std::make_unique<ElementBuffer>(
+        indices, indicesSize, BufferUsage::Static
+    );
+    EBO->Use();
 }
 
 /**
@@ -80,11 +91,13 @@ void Mesh::Render() const {
 }
 
 void Mesh::Draw() const  {
-    if (usesEBO)
-        glDrawElements(GL_TRIANGLES, EBO.GetArraySize(), GL_UNSIGNED_INT, 0);
-    else
-        glDrawArrays(GL_TRIANGLES, 0, VBO.GetArrayCount());
+    bool usesIndexBuffer = EBO != nullptr;
 
-    // unbind whatever the shader enabled
+    if (usesIndexBuffer)
+        glDrawElements(GL_TRIANGLES, EBO->GetArraySize(), GL_UNSIGNED_INT, 0);
+    else
+        glDrawArrays(GL_TRIANGLES, 0, VBO->GetArrayCount());
+
+    // unbind whatever the shaders enabled
     glDisable(GL_BLEND | GL_STENCIL);
 }

@@ -2,9 +2,9 @@
 
 using namespace CEngine;
 
-Material::Material() { }
+Material::Material() : cullMode(Material::CullingMode::FrontBack), shader(nullptr) { }
 
-Material::Material(std::shared_ptr<Shader> ptr) {
+Material::Material(std::shared_ptr<Shader> ptr) : Material() {
     // assuming another material is using the same shader...
     shader = ptr;
 }
@@ -43,6 +43,10 @@ void Material::SetUniformBlock(const UBO& ubo) {
     linkedUniformBlocks.push_back(ubo.ID());
 }
 
+void Material::SetCullingMode(Material::CullingMode cm) {
+    cullMode = cm;
+}
+
 void Material::AddTexture(std::shared_ptr<Texture> tex, const std::string& textureNameInShader) {
     int textureIndex = textures.size();
     // to bind with current VAO and material
@@ -59,6 +63,7 @@ void Material::Render() const {
     
     Use();
     shader->BindShaderFlags();
+    enableInnerFlags();
 
     // bind each texture-set
     for (int i(0); i < textures.size(); i++) {
@@ -94,4 +99,21 @@ void Material::SetUniform(const std::string& name, const Color& value) {
 
 std::shared_ptr<Shader> Material::InnerShader() const {
     return shader;
+}
+
+Material::CullingMode Material::GetCullingMode() const {
+    return cullMode;
+}
+
+void Material::enableInnerFlags() const {
+    switch (cullMode)
+    {
+        case CEngine::Material::CullingMode::Back: 
+            glCullFace(GL_BACK); break;
+        case CEngine::Material::CullingMode::FrontBack: 
+            glCullFace(GL_FRONT_AND_BACK);
+            break;
+        default:
+            glCullFace(GL_FRONT); break;
+    }
 }

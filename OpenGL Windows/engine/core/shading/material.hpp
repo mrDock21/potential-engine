@@ -15,6 +15,9 @@ namespace CEngine {
 
     class Material {
     public:
+
+        enum class CullingMode { Front, Back, FrontBack };
+
         Material();
         Material(std::shared_ptr<Shader>);
         /**
@@ -29,6 +32,7 @@ namespace CEngine {
 
         void SetShader(std::shared_ptr<Shader>);
         void SetUniformBlock(const UBO&);
+        void SetCullingMode(CullingMode);
 
         void AddTexture(std::shared_ptr<Texture>, const std::string&);
         void SetUniform(const std::string&, const int&);
@@ -39,13 +43,18 @@ namespace CEngine {
         void SetUniform(const std::string&, const Color&);
 
         std::shared_ptr<Shader> InnerShader() const;
+        CullingMode GetCullingMode() const;
 
     private:
+
+        void enableInnerFlags() const;
         
         // a material may share the shader with another
         std::shared_ptr<Shader> shader;         
         // each may have different textures...
-        std::vector< std::shared_ptr<Texture> > textures;          
+        std::vector< std::shared_ptr<Texture> > textures; 
+
+        CullingMode cullMode;
 
         std::vector<uint> linkedUniformBlocks;  // linked uniforms
     };

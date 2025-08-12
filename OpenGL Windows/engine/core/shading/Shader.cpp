@@ -2,26 +2,30 @@
 
 using namespace CEngine;
 
-Shader::Shader() : _ProgramID(0), _type(Type::Opaque) { }
+Shader::Shader() : _type(Type::Opaque) {
+    _ProgramID = glCreateProgram();
+}
 
-Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc) 
-    : _type(Type::Opaque) {
+Shader::~Shader() {
+    glDeleteProgram(_ProgramID);
+}
+
+Shader::Shader(const std::string& vertexSrc, const std::string& fragSrc) : Shader() {
 
     uint vertexShader = CompileShader(vertexSrc, GL_VERTEX_SHADER),
          fragmentShader = CompileShader(fragSrc, GL_FRAGMENT_SHADER);
     
-    if (vertexShader == 0 || fragmentShader == 0) {
-        _ProgramID = 0;
+    if (vertexShader == 0 || fragmentShader == 0)
         return;
-    }
-    _ProgramID = glCreateProgram();
+    
+    Use();
 
     glAttachShader(_ProgramID, vertexShader);
     glAttachShader(_ProgramID, fragmentShader);
     glLinkProgram(_ProgramID);
 
     if (!OperationSucceded())
-        std::cout << "[SHADER-CREATION-ERROR] Couldn't link program!" << std::endl;
+        Logger::Warning("----Shader ERROR= Couldn't link program!");
     
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -33,6 +37,10 @@ void Shader::Use() const {
 
 void Shader::ShaderType(Shader::Type type) {
     _type = type;
+}
+
+Shader::Type Shader::GetType() const {
+    return _type;
 }
 
 void Shader::SetUniformBlock(const std::string& blockName, const uint& bindingIndex) {
@@ -126,7 +134,8 @@ bool Shader::OperationSucceded() const {
 
     if (!success) {
         glGetShaderInfoLog(_ProgramID, sizeof(infolog), NULL, infolog);
-        std::cout << "[SHADER-PROGRAM-ERROR] " << infolog << std::endl;
+        Logger::Warning("\n-----Shader-LOG");
+        Logger::Warning(std::string(infolog));
         return false;
     }
     return true;

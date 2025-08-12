@@ -24,14 +24,18 @@ namespace CEngine {
     class Shader {
     public:
         
-        enum Type { Opaque, Transparent };
+        enum class Type { Opaque, Transparent };
 
         Shader();
+        ~Shader();
         Shader(const std::string&, const std::string&);
+
         void Use() const;
         void BindShaderFlags() const;
 
         void ShaderType(Type);
+
+        Type GetType() const;
 
         void SetUniformBlock(const std::string&, const uint&);
 

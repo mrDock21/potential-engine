@@ -13,7 +13,15 @@ uint CEngine::getGlBufferUsage(const BufferUsage& usage) {
     return 0;
 }
 
-VertexBuffer::VertexBuffer() : elementSize(0), bytesSize(0) { }
+VertexBuffer::VertexBuffer() : elementSize(0), bytesSize(0), ID(0) { 
+    // vertex buffer
+    glGenBuffers(1, &ID);
+}
+
+VertexBuffer::~VertexBuffer() {
+
+    glDeleteBuffers(1, &ID);
+}
 
 /**
  * Constructs a new vertex buffer object
@@ -23,7 +31,7 @@ VertexBuffer::VertexBuffer() : elementSize(0), bytesSize(0) { }
  * @param glUsage OpenGL draw mode constant
  */
 VertexBuffer::VertexBuffer(
-        float* verts, const u_long& size, const u_long& eSize, const BufferUsage& glUsage
+        float verts[], const u_long& size, const u_long& eSize, const BufferUsage& glUsage
     )
     : elementSize(eSize), bytesSize(size) {
     // vertex buffer

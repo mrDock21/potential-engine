@@ -2,8 +2,14 @@
 
 using namespace CEngine;
 
-ElementBuffer::ElementBuffer() : arraySize(0), bytesSize(0) {
+ElementBuffer::ElementBuffer() : arraySize(0), bytesSize(0), ID(0) {
+    // vertex buffer
+    glGenBuffers(1, &ID);
+}
 
+ElementBuffer::~ElementBuffer() {
+    // vertex buffer
+    glDeleteBuffers(1, &ID);
 }
 
 /**
@@ -12,7 +18,7 @@ ElementBuffer::ElementBuffer() : arraySize(0), bytesSize(0) {
  * @param size byte size of "indices"
  * @param glUsage OpenGL draw mode constant
  */
-ElementBuffer::ElementBuffer(uint* indices, const u_long& size, const BufferUsage& glUsage) 
+ElementBuffer::ElementBuffer(uint indices[], const u_long& size, const BufferUsage& glUsage)
     : arraySize(size / sizeof(uint)), bytesSize(size) {
     // vertex buffer
     glGenBuffers(1, &ID);

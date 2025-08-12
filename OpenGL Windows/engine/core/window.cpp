@@ -107,7 +107,10 @@ void Window::Close() const { glfwSetWindowShouldClose(window, true); }
  * Starts rendering main loop
 */
 void Window::MainLoop() {
+
     OnMainLoopInit();
+    // enable culling mode by default
+    //glEnable(GL_CULL_FACE);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {

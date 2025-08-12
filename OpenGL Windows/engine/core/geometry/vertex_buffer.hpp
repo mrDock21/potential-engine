@@ -18,6 +18,7 @@ namespace CEngine {
         public:
             VertexBuffer();
             VertexBuffer(float[], const u_long&, const u_long&, const BufferUsage&);
+            ~VertexBuffer();
             void Use() const;
             u_long GetArrayCount() const;
             u_long GetBytesSize() const;

@@ -16,6 +16,7 @@ namespace CEngine {
     class Mesh {
         public:
             Mesh();
+            ~Mesh();
             Mesh(float[], const u_long&, const u_long&, uint[], const u_long&);
             Mesh(float[], const u_long&, const u_long&);
 
@@ -26,9 +27,8 @@ namespace CEngine {
 
         private:
             uint VAO;
-            VertexBuffer VBO;
-            ElementBuffer EBO;
-            bool usesEBO;
+            std::unique_ptr<VertexBuffer> VBO;
+            std::unique_ptr<ElementBuffer> EBO;
     };
 }
 
