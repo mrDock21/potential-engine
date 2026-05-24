@@ -23,7 +23,7 @@
 
   "ModelShader": {
     "Vertex": "MultipleLights_Vertex.shader",
-    "Frag": "Model importing/MIBasic.shader"
+    "Frag": "Model importing/Blinn-Phong-Frag.shader"
   },
 
   "ScreenShader": {

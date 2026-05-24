@@ -39,7 +39,7 @@ add_executable (CMakeTarget
 	"vendor/imgui/backend/imgui_impl_glfw.cpp"
 	"vendor/imgui/backend/imgui_impl_opengl3.cpp"
 	"vendor/imgui/backend/imgui_stdlib.cpp"
-)
+ )
 # If intellisense breaks, go to Visual studio menu (to regenerate): 
 #	Proyect => Configure OpenGL Windows
 
