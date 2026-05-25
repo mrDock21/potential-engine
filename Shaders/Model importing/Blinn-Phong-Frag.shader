@@ -88,7 +88,8 @@ vec3 computePointLight(vec3 normal, PointLight pLight, vec3 viewDir, vec3 fragPo
 
 	float k1 = 0.09f, kq = 0.032f;
 	float dist = distance(lPos, fragPos),
-		att = 1.0f / (1.0f + k1 * dist + kq * (dist * dist));
+		// for gamma correction, this formula works better
+		att = 1.0f / (dist * dist);
 
 	// diffuse
 	float diffuseFactor = max(dot(normal, frag2LightDir), 0);

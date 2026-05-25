@@ -2,7 +2,8 @@
 
 using namespace CEngine;
 
-CubeMap::CubeMap() : cubeMesh(nullptr), skyboxMat(nullptr) {
+CubeMap::CubeMap() 
+	: cubeMesh(nullptr), skyboxMat(nullptr), texColorSpace(Texture::TexColorSpace::LINEAR) {
 
 	glGenTextures(1, &ID);
 	Use();
@@ -15,8 +16,30 @@ CubeMap::CubeMap(const std::vector<std::string>& imgs) : CubeMap() {
 	AssignTextures(imgs);
 }
 
+CubeMap::CubeMap(const std::vector<std::string>& imgs, const Texture::TexColorSpace& colorSpace) 
+	: CubeMap() {
+
+	texColorSpace = colorSpace;
+	AssignTextures(imgs);
+}
+
 CubeMap::CubeMap(const std::vector<std::string>& imgs, std::shared_ptr<Material> mat) 
 	: CubeMap(imgs) {
+
+	skyboxMat = mat;
+
+	// bind all together
+	cubeMesh->Use();
+	skyboxMat->Use();
+	Use();
+}
+
+CubeMap::CubeMap(const std::vector<std::string>& imgs, std::shared_ptr<Material> mat, const Texture::TexColorSpace& colorSpace) 
+	: CubeMap() {
+
+	texColorSpace = colorSpace;
+
+	AssignTextures(imgs);
 
 	skyboxMat = mat;
 
@@ -67,6 +90,10 @@ void CubeMap::AssignTextures(const std::vector<std::string>& imgs) {
 
 void CubeMap::AssignTexture(const u_char* imgData, int width, int height, TextureDir texDir) {
 	uint texSide(GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	uint texFormat = GL_RGB;
+
+	if (texColorSpace == Texture::TexColorSpace::GAMMA)
+		texFormat = GL_SRGB;
 
 	switch (texDir)
 	{
@@ -93,7 +120,7 @@ void CubeMap::AssignTexture(const u_char* imgData, int width, int height, Textur
 	glTexImage2D(
 		texSide,
 		0, // 0 means this is the base texture
-		GL_RGB,
+		texFormat,
 		width,
 		height,
 		0,  // legacy stuff (must always be 0)

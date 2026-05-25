@@ -8,15 +8,33 @@ Texture::Texture(const std::string& imgName, const TexFormat& format, const Pixe
     Init(imgName, format, pxlFormat);
 }
 
-Texture::Texture(const std::string& imgName, const ImgType& imgType) {
+Texture::Texture(const std::string& imgName, const ImgType& imgType) 
+    : Texture(imgName, imgType, TexColorSpace::LINEAR) {
+
+}
+
+Texture::Texture(const std::string& name, const ImgType& imgType, const TexColorSpace& cSpace) {
+    
+    PixelFormat importedPixelFormat = PixelFormat::RGB;
+    TexFormat importedFormat = 
+        (cSpace == TexColorSpace::LINEAR) ? TexFormat::RGB : TexFormat::sRGB;
+
+    if (imgType == ImgType::PNG) {
+        importedFormat = (cSpace == TexColorSpace::LINEAR) ? TexFormat::RGBA : TexFormat::sRGBA;
+        importedPixelFormat = PixelFormat::RGBA;
+    }
+    
     switch (imgType)
     {
-    case ImgType::JPEG: Init(imgName, TexFormat::RGB, PixelFormat::RGB); break;
-    case ImgType::PNG: Init(imgName, TexFormat::RGBA, PixelFormat::RGBA); break;
+    case ImgType::JPEG: break;
+    case ImgType::PNG: break;
     default:
-        Logger::Warning("Image type for [" + imgName + "] is not yet initialized...");
+        Logger::Warning("Image type for [" + name + "] is not yet initialized...");
         break;
     }
+
+    Init(name, importedFormat, importedPixelFormat);
+
 }
 
 Texture::Texture(int w, int h, const TexFormat& format, const PixelFormat& pxlFormat) {
@@ -95,6 +113,10 @@ uint Texture::GetGLFormat(const TexFormat& format) {
         return GL_RGB;
     case TexFormat::RGBA:
         return GL_RGBA;
+    case TexFormat::sRGB:
+        return GL_SRGB;
+    case TexFormat::sRGBA:
+        return GL_SRGB_ALPHA;
     default:
         break;
     }

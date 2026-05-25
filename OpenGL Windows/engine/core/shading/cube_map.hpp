@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 
 #include "material.hpp"
+#include "texture.hpp"
 
 #include "types/types.hpp"
 #include "math_types/matrix4.hpp"
@@ -23,7 +24,9 @@ namespace CEngine {
 
 		CubeMap();
 		CubeMap(const std::vector<std::string>&);
+		CubeMap(const std::vector<std::string>&, const Texture::TexColorSpace&);
 		CubeMap(const std::vector<std::string>&, std::shared_ptr<Material>);
+		CubeMap(const std::vector<std::string>&, std::shared_ptr<Material>, const Texture::TexColorSpace&);
 		~CubeMap();
 
 		void Use() const;
@@ -44,6 +47,8 @@ namespace CEngine {
 		uint ID;
 		std::shared_ptr<Material> skyboxMat;
 		std::unique_ptr<Mesh> cubeMesh;
+
+		Texture::TexColorSpace texColorSpace;
 
 		static constexpr int MAX_TEXTURES = 6;
 	};

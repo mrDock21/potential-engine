@@ -11,19 +11,22 @@ namespace CEngine {
 
     class Texture {
         public:
-            enum class TexFormat { R, RG, RGB, RGBA };
+            enum class TexFormat { R, RG, RGB, RGBA, sRGB, sRGBA };
             enum class PixelFormat { 
                 R, RG, RGB, BGR, RGBA, BGRA, 
                 R_INT, RG_INT, RGB_INT, BGR_INT, 
                 RGBA_INT, BRGA_INT, STENCIL 
             };
             enum class ImgType { JPEG, PNG };
+            enum class TexColorSpace { LINEAR, GAMMA };
 
             Texture();
             // Create and read texture with specific formats
             Texture(const std::string&, const TexFormat&, const PixelFormat&);
             // Create and read texture by specific image type
             Texture(const std::string&, const ImgType&);
+            // Create and read texture by specific image type, and color space
+            Texture(const std::string&, const ImgType&, const TexColorSpace&);
             // Create an EMPTY texture with specific image type
             Texture(int, int, const TexFormat&, const PixelFormat&);
 
