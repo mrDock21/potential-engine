@@ -35,5 +35,6 @@ set (CORE_FILES
 	core/frame_buffers/render_buffer.cpp 
 	core/frame_buffers/frame_buffer_quad.cpp 
 	core/shading/cube_map.cpp
-)
+	core/shading/depth_texture.cpp
+	core/frame_buffers/depth_frame_buffer.cpp)
 add_library (engine ${CORE_FILES})

@@ -29,7 +29,8 @@ add_executable (CMakeTarget
 	# "excercises/Screen Effects/FramebufferBasics.cpp"
 	# "excercises/Screen Effects/FramebufferRearView.cpp"
 	# "excercises/Screen Effects/skybox_Basic.cpp"
-	"excercises/Screen Effects/skybox_gammaCorrection.cpp"
+	# "excercises/Screen Effects/skybox_gammaCorrection.cpp"
+	"excercises/Shadow Mapping/shadows_directionalLight.cpp"
 
 	#vendor files
 	# crosspplatform window
