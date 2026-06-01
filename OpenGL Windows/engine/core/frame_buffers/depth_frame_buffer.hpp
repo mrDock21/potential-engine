@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <functional>
 #include <glad/glad.h>
 
 #include "types/types.hpp"
@@ -18,7 +19,9 @@ namespace CEngine {
 
 		void Use() const;
 
-		//public void Render
+		void Render(std::function<void()>) const;
+
+		std::shared_ptr<DepthTexture> Tex() const;
 
 	private:
 		std::shared_ptr<FrameBuffer> frameBufferPtr;

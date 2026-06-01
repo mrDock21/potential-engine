@@ -46,6 +46,18 @@ void Actor::Render() {
 	EndRender();
 }
 
+void Actor::RenderWith(const Material& usedMat) {
+	// binds VAO
+	meshPtr->Render();
+
+	usedMat.Render();
+
+	// set base uniforms (model is for the mesh)
+	materialPtr->SetUniform("model", Transform().ModelMatrix());
+
+	EndRender();
+}
+
 void Actor::BeginRender() {
 	// binds VAO
 	meshPtr->Render();

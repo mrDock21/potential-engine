@@ -2,9 +2,9 @@
 
 using namespace CEngine;
 
-FrameBufferQuad::FrameBufferQuad(int texWidth, int texHeight, Shader* const screenShader) {
+FrameBufferQuad::FrameBufferQuad(int texWidth, int texHeight, const std::shared_ptr<Shader>& s) {
 
-	initBuffers(texWidth, texHeight, screenShader);
+	initBuffers(texWidth, texHeight, s);
 	initQuadMesh();
 
 	// bind them together...
@@ -13,9 +13,9 @@ FrameBufferQuad::FrameBufferQuad(int texWidth, int texHeight, Shader* const scre
 }
 
 FrameBufferQuad::FrameBufferQuad(
-	int texW, int texH, Shader* const screenShader, float verts_uvs[], u_long arrSize
+	int texW, int texH, const std::shared_ptr<Shader>& shader, float verts_uvs[], u_long arrSize
 ) {
-	initBuffers(texW, texH, screenShader);
+	initBuffers(texW, texH, shader);
 
 	initQuadMesh(verts_uvs, arrSize);
 
@@ -32,15 +32,22 @@ void FrameBufferQuad::UseAsRenderTarget() const {
 	glEnable(GL_DEPTH_TEST);
 }
 
+void FrameBufferQuad::RenderQuad() const {
+	RenderQuad(false);
+}
+
 //	Moves rendered texture to the Quad's shader and draws it as a plane 
 //  [NOTE] scene should have been rendered already
 void FrameBufferQuad::RenderQuad(bool shouldClearDefaultBuffer) const {
 
-	framebufferPtr->Unbind();
+	RenderQuad(shouldClearDefaultBuffer, []() { /* Empty lambda */ });
+}
 
+void FrameBufferQuad::RenderQuad(bool shouldClear, std::function<void()> inBetweenFunc) const {
+	framebufferPtr->Unbind();
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-	if (shouldClearDefaultBuffer)
+	if (shouldClear)
 		// will delete everything in the screen
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -49,13 +56,13 @@ void FrameBufferQuad::RenderQuad(bool shouldClearDefaultBuffer) const {
 	quad->Use();
 	quadMaterial->Use();
 	quadMaterial->Render();
+	inBetweenFunc();
 	quad->Draw();
 }
 
-void FrameBufferQuad::initBuffers(int texWidth, int texHeight, Shader* const screenShader) {
+void FrameBufferQuad::initBuffers(int texWidth, int texHeight, const std::shared_ptr<Shader>& shader) {
 	std::shared_ptr<Texture> screenTexture;
 	std::shared_ptr<RenderBuffer> stencilDepthBuffer;
-	std::shared_ptr<Shader> screenShrPtr(screenShader);
 
 	framebufferPtr = std::make_unique<FrameBuffer>();
 	framebufferPtr->Use();
@@ -77,7 +84,7 @@ void FrameBufferQuad::initBuffers(int texWidth, int texHeight, Shader* const scr
 	framebufferPtr->Attach(stencilDepthBuffer);
 
 	// link material with the empty (screen) texture
-	quadMaterial = std::make_unique<Material>(screenShrPtr);
+	quadMaterial = std::make_shared<Material>(shader);
 	quadMaterial->AddTexture(screenTexture, "screenTexture");
 
 	// all set: go back to default

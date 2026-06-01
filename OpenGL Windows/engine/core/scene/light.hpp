@@ -20,6 +20,8 @@ namespace CEngine {
 
 		virtual void Render(){ /* Not used for now */ }
 
+		virtual void RenderWith(const Material& _) { /* Not used for now */ }
+
 		Color GetColor() const;
 
 	private:

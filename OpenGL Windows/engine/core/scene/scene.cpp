@@ -5,8 +5,13 @@ using namespace CEngine;
 Scene::Scene() : innerCount(0), lightCount(0) {
 	Color c;
 	c.Set255(Vector3(255.0f, 87.0f, 51.0f));
-	sun.SetColor(c);
-	sun.Dir(Vector3(-1, -1, -1));
+	Sun.SetColor(c);
+	Sun.Dir(Vector3(-1, -1, -1));
+}
+
+Scene::Scene(const DirectionalLight& otherSun) : Scene() {
+	Sun.SetColor(otherSun.GetColor());
+	Sun.Dir(otherSun.Dir());
 }
 
 Scene::~Scene() {
@@ -110,8 +115,27 @@ void Scene::Render(const Matrix4& view, const Matrix4& proj, CubeMap* const sky)
 	for (auto actor : transparentActors) {
 		actor.Obj->Render();
 	}
+}
 
-	// Transparent objects rendering 
+void Scene::RenderDepth(const Matrix4& view, const Matrix4& proj, const Material& depthShader) {
+	
+	// update View matrix => Should from the lights/camera/object perspective
+	// since it's the first, we set offset to 0
+	globalMatricesBuffer.Upload(view, 0);
+
+	// update Projection matrix => Should from the lights/object perspective/orthographic
+	// since the 'view' matrix is before this one, the offset is different
+	globalMatricesBuffer.Upload(proj, Matrix4::Size());
+
+	// Opaque rendering 
+	for (auto actor : opaqueActors) {
+		actor.Obj->RenderWith(depthShader);
+	}
+
+	// Opaque rendering 
+	for (auto actor : transparentActors) {
+		actor.Obj->RenderWith(depthShader);
+	}
 }
 
 std::shared_ptr<Object> Scene::GetChild(const int& i) {
@@ -151,13 +175,13 @@ void Scene::UpdateSun() {
 	// since the array is allocated in memory already, we skip the whole thing...
 	float offset = LIGHTS_ARRAY_SIZE;
 	//	upload dir
-	globalLightsBuffer.Upload(Vector4(sun.Dir(), 0.0f), offset);
+	globalLightsBuffer.Upload(Vector4(Sun.Dir(), 0.0f), offset);
 	offset += Vector4::Size();
 	//	upload color
-	globalLightsBuffer.Upload(sun.GetColor().RGBA(), offset);
+	globalLightsBuffer.Upload(Sun.GetColor().RGBA(), offset);
 	offset += Vector4::Size();
 	//	upload ambient color
-	globalLightsBuffer.Upload(sun.GetColor().RGBA() * 0.1f, offset);
+	globalLightsBuffer.Upload(Sun.GetColor().RGBA() * 0.1f, offset);
 	offset += Vector4::Size();
 	// update current count
 	globalLightsBuffer.Upload((float)lightCount, offset);

@@ -27,9 +27,11 @@ namespace CEngine {
 		///		Renders and draws the entire object. 
 		///		If shader properties are needed: use BeginRender() instead
 		/// </summary>
-		/// <param name="">	View matrix			</param>
-		/// <param name="">	Projection matrix	</param>
 		virtual void Render();
+		/// <summary>
+		///		Renders this object with a specific shader
+		/// </summary>
+		virtual void RenderWith(const Material& usedMaterial);
 
 		/// <summary>
 		///		Binds OpenGL object (gives room to set shader properties).

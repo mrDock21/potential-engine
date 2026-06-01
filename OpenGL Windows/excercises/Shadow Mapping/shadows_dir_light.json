@@ -23,13 +23,18 @@
   },
 
   "ModelShader": {
-    "Vertex": "MultipleLights_Vertex.shader",
-    "Frag": "Model importing/Blinn-Phong-Frag.shader"
+    "Vertex": "Shadow Mapping Shaders/Model-Vertex.shader",
+    "Frag": "Shadow Mapping Shaders/Model-Blinn-Phong-Frag.shader"
   },
 
   "ScreenShader": {
-    "Vertex": "Framebuffer basics/screen_vertex.shader",
-    "Frag": "Framebuffer basics/screen_frag_basic.shader"
+    "Vertex": "Shadow Mapping Shaders/FrameBuffer-Screen-Vertex.shader",
+    "Frag": "Shadow Mapping Shaders/FrameBuffer-Screen-Frag.shader"
+  },
+
+  "DebugScreenShader": {
+    "Vertex": "Shadow Mapping Shaders/FrameBuffer-Screen-Vertex.shader",
+    "Frag": "Shadow Mapping Shaders/Debug-FrameBuffer-Screen-Frag.shader"
   },
 
   "SkyboxTextures": [

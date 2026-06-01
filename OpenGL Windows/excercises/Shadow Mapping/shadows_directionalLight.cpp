@@ -41,14 +41,21 @@ using json = nlohmann::json;
 class ShadowsDirectionalLights : public Window {
 public:
     ShadowsDirectionalLights(const std::string& wnd, const int& w, const int h, const json& jsonConfig)
-        : Window(wnd, w, h), mainCamera()
+        : Window(wnd, w, h), mainCamera(), mainScene()
     {
         RetrieveSettings(jsonConfig);
 
         depthFrameBuffer = std::make_unique<DepthFrameBuffer>(1024, 1024);
 
         screenFrameBuffer = std::make_unique<FrameBufferQuad>(
-            w, h, new Shader(settings.ScreenShaderVertex, settings.ScreenShaderFrag)
+            w, h, std::make_shared<Shader>(settings.ScreenShaderVertex, settings.ScreenShaderFrag)
+        );
+
+        debugScreenFrameBufferShader = std::make_shared<Shader>(
+            settings.DebugScreenShaderVertex, settings.DebugScreenShaderFrag
+        );
+        debugScreenFrameBuffer = std::make_unique<FrameBufferQuad>(
+            w, h, debugScreenFrameBufferShader
         );
 
         CreateSkybox();
@@ -58,7 +65,9 @@ public:
     }
 
     ~ShadowsDirectionalLights() {
+
         std::cout << "[Framebuffer_Basics::FreesMemory]" << std::endl;
+
     }
 
     void RetrieveSettings(const json& jsonConfig) {
@@ -89,6 +98,11 @@ public:
             Assets::GetShaderCode(jsonConfig["ScreenShader"]["Vertex"]);
         settings.ScreenShaderFrag = 
             Assets::GetShaderCode(jsonConfig["ScreenShader"]["Frag"]);
+
+        settings.DebugScreenShaderVertex = 
+            Assets::GetShaderCode(jsonConfig["DebugScreenShader"]["Vertex"]);
+        settings.DebugScreenShaderFrag =
+            Assets::GetShaderCode(jsonConfig["DebugScreenShader"]["Frag"]);
     
         settings.SkyBoxImgs = Assets::GetFilePaths( jsonConfig["SkyboxTextures"] );
         settings.SkyboxShaderVertex = 
@@ -263,9 +277,40 @@ public:
     }
 
     void OnRender() {
+        
+        //RenderDepthBuffer();
+        RenderSceneNormally();
+    }
+
+    void RenderDepthBuffer() {
+        Matrix4 proj, view;
+        Vector3 sunPos(-2.0f, 4.0f, -1.0f), lookPos(0);
+        const float nearPlane(1.0), farPlane(7.5f);
+
+        proj = Matrix4::Ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+        view = Matrix4::LookAt(sunPos, lookPos, Vector3::Up());
+
+        depthFrameBuffer->Render([this, &proj, &view]() {
+
+            mainScene.RenderDepth(view, proj, *depthFrameBufferShader);
+            
+        });
+
+        debugScreenFrameBuffer->UseAsRenderTarget();
+        debugScreenFrameBuffer->RenderQuad(false, [this]() {
+            
+            //debugScreenFrameBufferShader->up
+            // bind image with texture set 0 + N
+            glActiveTexture(GL_TEXTURE0);
+            depthFrameBuffer->Tex()->Use();
+            // connect the texture set and the uniform in the shader 
+            //debugScreenFrameBufferShader->SetUniform("screenTexture", 0);
+        });
+    }
+
+    void RenderSceneNormally() {
         // transformations
         Matrix4 proj, view = mainCamera.GetViewMatrix();
-        const bool shouldNotClearColors = false;
 
         proj = Matrix4::Perspective(
             settings.CamFOV, (float)GetAspectRatio(), settings.CamNear, settings.CamFar
@@ -276,10 +321,8 @@ public:
         // render the whole scene to screen texture
         mainScene.Render(view, proj, backgroundSkybox.get());
 
-        // display the final from framebuffer
-        screenFrameBuffer->RenderQuad( shouldNotClearColors );
-
-        // delta time is updated, internally, by window
+        // display the final screen from framebuffer
+        screenFrameBuffer->RenderQuad();
     }
 
 private:
@@ -287,6 +330,11 @@ private:
     Camera mainCamera;
     // needed for shadows
     std::unique_ptr<DepthFrameBuffer> depthFrameBuffer;
+    std::unique_ptr<Material> depthFrameBufferShader;
+    // shadows and depth debug
+    std::unique_ptr<FrameBufferQuad> debugScreenFrameBuffer;
+    std::shared_ptr<Shader> debugScreenFrameBufferShader;
+
     // post-processing effects
     std::unique_ptr<FrameBufferQuad> screenFrameBuffer;
     std::unique_ptr<CubeMap> backgroundSkybox;
@@ -304,6 +352,8 @@ private:
         std::string BunnyTexturePath, WindowTexturePath, FloorTexturePath;
 
         std::string ScreenShaderVertex, ScreenShaderFrag;
+
+        std::string DebugScreenShaderVertex, DebugScreenShaderFrag;
 
         std::vector<std::string> SkyBoxImgs;
         std::string SkyboxShaderVertex, SkyboxShaderFrag;

@@ -21,5 +21,10 @@ namespace CEngine {
 		///		Custom rendering logic
 		/// </summary>
 		virtual void Render() = 0;
+
+		/// <summary>
+		///		Renders this object with a specific shader
+		/// </summary>
+		virtual void RenderWith(const Material& usedMaterial) = 0;
 	};
 }

@@ -37,6 +37,7 @@ namespace CEngine {
             static Matrix4 Rotate(const Matrix4&, const float&, const Vector3&);
             static Matrix4 LookAt(const Vector3&, const Vector3&, const Vector3&);
             static Matrix4 Perspective(const float&, const float&, const float&, const float&);
+            static Matrix4 Ortho(const float&, const float&, const float&, const float&, const float&, const float&);
         
         private:
             glm::mat4 matrix;

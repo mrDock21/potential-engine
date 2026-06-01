@@ -61,3 +61,16 @@ Matrix4 Matrix4::Perspective(
         glm::perspective(fov, aspectRatio, nearPlane, farPlane)
     );
 }
+
+Matrix4 Matrix4::Ortho(
+    const float& left,
+    const float& right,
+    const float& top,
+    const float& bottom,
+    const float& near,
+    const float& far
+    ) {
+    return Matrix4(
+        glm::ortho(left, right, bottom, top, near, far)
+    );
+}
