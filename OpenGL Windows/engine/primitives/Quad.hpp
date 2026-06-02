@@ -8,13 +8,13 @@ namespace CEngine::Primitives {
 	
     class Quad : public CEngine::Actor {
 	public:
-		Quad(const std::string& name, CEngine::Material* mat) { 
+		Quad(const std::string& name, const std::shared_ptr<CEngine::Material> &mat) { 
 
             build(name, mat);
         }
 
 	private:
-		void build(const std::string& name, CEngine::Material* mat) {
+		void build(const std::string& name, const std::shared_ptr<CEngine::Material> &mat) {
             float rect[] = {
                 // vertices       //normals      // uv's
                 // front face

@@ -62,11 +62,18 @@ Matrix4 Matrix4::Perspective(
     );
 }
 
+/// <summary>
+///     Creates an orthographic projection matrix
+/// </summary>
+/// <param name="left">-> Coordinate of the left vertical clipping plane (usually 0.0f)</param>
+/// <param name="right">-> Coordinate of the right vertical clipping plane (usually screen width)</param>
+/// <param name="bottom">->Coordinate of the bottom horizontal clipping plane (usually screen height)</param>
+/// <param name="top">-> Coordinate of the top horizontal clipping plane (usually 0.0f or screen height)</param>
 Matrix4 Matrix4::Ortho(
     const float& left,
     const float& right,
-    const float& top,
     const float& bottom,
+    const float& top,
     const float& near,
     const float& far
     ) {

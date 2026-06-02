@@ -17,6 +17,7 @@ namespace CEngine {
 		~DepthTexture();
 
 		void Use() const;
+		void Unbind() const;
 
 	private:
 		uint ID;

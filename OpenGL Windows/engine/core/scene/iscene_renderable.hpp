@@ -26,5 +26,8 @@ namespace CEngine {
 		///		Renders this object with a specific shader
 		/// </summary>
 		virtual void RenderWith(const Material& usedMaterial) = 0;
+
+		virtual void SetMaterial(const std::shared_ptr<Material>&) = 0;
+		virtual const std::shared_ptr<Material>& material() const = 0;
 	};
 }

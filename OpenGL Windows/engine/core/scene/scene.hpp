@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "types/types.hpp"
 
@@ -50,6 +51,8 @@ namespace CEngine {
 		void Render(const Matrix4&, const Matrix4&, CubeMap* const);
 
 		void RenderDepth(const Matrix4&, const Matrix4&, const Material&);
+
+		void ForEachObject(std::function<void(const std::shared_ptr<Object>&)>);
 
 		std::shared_ptr<Object> GetChild(const int&);
 

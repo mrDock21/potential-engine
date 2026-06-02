@@ -31,6 +31,10 @@ void DepthTexture::Use() const {
 	glBindTexture(GL_TEXTURE_2D, ID);
 }
 
+void DepthTexture::Unbind() const {
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 DepthTexture::~DepthTexture() {
 	glDeleteTextures(1, &ID);
 }

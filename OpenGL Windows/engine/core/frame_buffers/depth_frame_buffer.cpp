@@ -5,9 +5,9 @@ using namespace CEngine;
 DepthFrameBuffer::DepthFrameBuffer(const unsigned int& with, const unsigned int& height) {
 
 	frameBufferPtr = std::make_shared<FrameBuffer>();
-	depthTexturePtr = std::make_shared<DepthTexture>(with, height);
-
 	frameBufferPtr->Use();
+
+	depthTexturePtr = std::make_shared<DepthTexture>(with, height);
 	depthTexturePtr->Use();
 
 	// linke the texture to this framebuffer
@@ -24,14 +24,12 @@ DepthFrameBuffer::DepthFrameBuffer(const unsigned int& with, const unsigned int&
 
 	//unbind
 	frameBufferPtr->Unbind();
-}
-
-DepthFrameBuffer::~DepthFrameBuffer() {
-
+	depthTexturePtr->Unbind();
 }
 
 void DepthFrameBuffer::Use() const {
-
+	frameBufferPtr->Use();
+	depthTexturePtr->Use();
 }
 
 void DepthFrameBuffer::Render(std::function<void()> sceneRenderFunc) const {
@@ -43,15 +41,19 @@ void DepthFrameBuffer::Render(std::function<void()> sceneRenderFunc) const {
 	// and adjust to this framebuffer
 	glViewport(0, 0, depthTexturePtr->width, depthTexturePtr->height);
 
-	frameBufferPtr->Use();
+	Use();
 
 	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
 
 	// render scene
 	sceneRenderFunc();
 
 	// go back to normal state
 	frameBufferPtr->Unbind();
+	depthTexturePtr->Unbind();
+
 	glViewport(0, 0, viewportData[2], viewportData[3]);
 }
 

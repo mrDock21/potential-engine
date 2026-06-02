@@ -16,6 +16,7 @@
 
 #include "scene/actor.hpp"
 #include "scene/spotlight.hpp"
+#include "scene/iscene_renderable.hpp"
 
 #include "scene/scene.hpp"
 
@@ -45,10 +46,14 @@ public:
     {
         RetrieveSettings(jsonConfig);
 
-        depthFrameBuffer = std::make_unique<DepthFrameBuffer>(1024, 1024);
-
         screenFrameBuffer = std::make_unique<FrameBufferQuad>(
             w, h, std::make_shared<Shader>(settings.ScreenShaderVertex, settings.ScreenShaderFrag)
+        );
+        
+        depthFrameBuffer = std::make_unique<DepthFrameBuffer>(1024, 1024);
+
+        depthFrameBufferShader = std::make_shared<Material>(
+            settings.DepthModelVertexShader, settings.DepthModelFragShader
         );
 
         debugScreenFrameBufferShader = std::make_shared<Shader>(
@@ -78,8 +83,13 @@ public:
         settings.CamNear = jsonConfig["CameraSettings"]["NearPlane"];
         settings.CamFar = jsonConfig["CameraSettings"]["FarPlane"];
 
+        settings.WindowWidth = jsonConfig["Window"]["Width"];
+        settings.WindowHeight = jsonConfig["Window"]["Height"];
+
+        // models
         settings.BunnyModelPath = 
             Assets::GetAssetPath(jsonConfig["ModelAssets"]["Model3D"]);
+        // textures
         settings.BunnyTexturePath = 
             Assets::GetAssetPath(jsonConfig["ModelAssets"]["BunnyTexture"]);
         
@@ -89,6 +99,7 @@ public:
         settings.FloorTexturePath = 
             Assets::GetAssetPath(jsonConfig["ModelAssets"]["FloorTexture"]);
 
+        // shaders
         settings.ModelShaderVertex = 
             Assets::GetShaderCode(jsonConfig["ModelShader"]["Vertex"]);
         settings.ModelShaderFrag = 
@@ -99,11 +110,18 @@ public:
         settings.ScreenShaderFrag = 
             Assets::GetShaderCode(jsonConfig["ScreenShader"]["Frag"]);
 
+        // Depth shaders
+        settings.DepthModelVertexShader =
+            Assets::GetShaderCode(jsonConfig["DepthModelShader"]["Vertex"]);
+        settings.DepthModelFragShader =
+            Assets::GetShaderCode(jsonConfig["DepthModelShader"]["Frag"]);
+
         settings.DebugScreenShaderVertex = 
             Assets::GetShaderCode(jsonConfig["DebugScreenShader"]["Vertex"]);
         settings.DebugScreenShaderFrag =
             Assets::GetShaderCode(jsonConfig["DebugScreenShader"]["Frag"]);
-    
+        
+        // skybox
         settings.SkyBoxImgs = Assets::GetFilePaths( jsonConfig["SkyboxTextures"] );
         settings.SkyboxShaderVertex = 
             Assets::GetShaderCode(jsonConfig["SkyboxShader"]["Vertex"]);
@@ -242,10 +260,10 @@ public:
         auto windowTex = std::make_shared<Texture>(
             settings.WindowTexturePath, Texture::ImgType::PNG, Texture::TexColorSpace::GAMMA
         );
-        Material* newMat;
-
-        shader->ShaderType(Shader::Type::Transparent);
-        newMat = new Material(shader);
+        std::shared_ptr <Material> newMat = std::make_shared<Material>(
+            settings.ModelShaderVertex, settings.ModelShaderFrag
+        );
+        newMat->InnerShader()->ShaderType(Shader::Type::Transparent);
 
         auto newQuad = std::make_shared<Primitives::Quad>("Window 1", newMat);
 
@@ -258,12 +276,12 @@ public:
     }
 
     void CreateFloorQuad() {
-        auto shader =
-            std::make_shared<Shader>(settings.ModelShaderVertex, settings.ModelShaderFrag);
         auto floorTex = std::make_shared<Texture>(
             settings.FloorTexturePath, Texture::ImgType::JPEG, Texture::TexColorSpace::GAMMA
         );
-        Material* newMat = new Material(shader);
+        auto newMat = std::make_shared<Material>(
+            settings.ModelShaderVertex, settings.ModelShaderFrag
+        );
 
         auto newQuad = std::make_shared<Primitives::Quad>("Floor", newMat);
 
@@ -273,26 +291,40 @@ public:
         newQuad->Transform().Rotate(90, Vector3::Right());
         newQuad->Transform().Scale(3);
 
-        mainScene.AddActor(newQuad);
+        mainScene.AddActor(newQuad); 
+        
+        blinnPhongShader = newMat;
     }
 
     void OnRender() {
         
-        //RenderDepthBuffer();
-        RenderSceneNormally();
+        RenderDepthBuffer();
+        //RenderSceneNormally();
     }
 
     void RenderDepthBuffer() {
         Matrix4 proj, view;
-        Vector3 sunPos(-2.0f, 4.0f, -1.0f), lookPos(0);
-        const float nearPlane(1.0), farPlane(7.5f);
+        Vector3 sunPos(1.5f, 1.5f, 0.0f), lookPos(0);
+        const float nearPlane(0.01), farPlane(7.5f);
 
-        proj = Matrix4::Ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+        sunPos = mainCamera.Transform().Position();
+        lookPos = sunPos + mainCamera.Transform().Forward();
+
+        proj = Matrix4::Ortho(
+            -3.0f, 3.0f, -3.0f, 3.0f, nearPlane, farPlane
+        );
         view = Matrix4::LookAt(sunPos, lookPos, Vector3::Up());
+
+        mainScene.ForEachObject([this](const std::shared_ptr<Object> &obj) {
+            std::shared_ptr<ISceneRenderable> renderable =
+                std::static_pointer_cast<ISceneRenderable>(obj);
+
+            renderable->SetMaterial(depthFrameBufferShader);
+        });
 
         depthFrameBuffer->Render([this, &proj, &view]() {
 
-            mainScene.RenderDepth(view, proj, *depthFrameBufferShader);
+            mainScene.Render(view, proj, nullptr);
             
         });
 
@@ -330,7 +362,8 @@ private:
     Camera mainCamera;
     // needed for shadows
     std::unique_ptr<DepthFrameBuffer> depthFrameBuffer;
-    std::unique_ptr<Material> depthFrameBufferShader;
+    std::shared_ptr<Material> depthFrameBufferShader;
+    std::shared_ptr<Material> blinnPhongShader;
     // shadows and depth debug
     std::unique_ptr<FrameBufferQuad> debugScreenFrameBuffer;
     std::shared_ptr<Shader> debugScreenFrameBufferShader;
@@ -344,7 +377,7 @@ private:
 
     // config file settings
     struct Settings {
-        int CamFOV;   
+        int CamFOV, WindowWidth, WindowHeight;   
         float CamNear, CamFar, CamLookSpeed, CamMovementSpeed;
 
         std::string BunnyModelPath, ModelShaderVertex, ModelShaderFrag;
@@ -352,6 +385,8 @@ private:
         std::string BunnyTexturePath, WindowTexturePath, FloorTexturePath;
 
         std::string ScreenShaderVertex, ScreenShaderFrag;
+
+        std::string DepthModelVertexShader, DepthModelFragShader;
 
         std::string DebugScreenShaderVertex, DebugScreenShaderFrag;
 

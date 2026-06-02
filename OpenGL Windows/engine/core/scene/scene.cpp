@@ -138,6 +138,16 @@ void Scene::RenderDepth(const Matrix4& view, const Matrix4& proj, const Material
 	}
 }
 
+void Scene::ForEachObject(std::function<void(const std::shared_ptr<Object>&)> lambda) {
+
+	for (SceneObject so : opaqueActors) {
+		lambda(so.Obj);
+	}
+	for (SceneObject so : transparentActors) {
+		lambda(so.Obj);
+	}
+}
+
 std::shared_ptr<Object> Scene::GetChild(const int& i) {
 
 	for (int j(0); j < opaqueActors.size(); j++) {

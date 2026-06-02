@@ -22,6 +22,11 @@ namespace CEngine {
 
 		virtual void RenderWith(const Material& _) { /* Not used for now */ }
 
+		virtual void SetMaterial(const std::shared_ptr<Material>& m){ /* Not used for now */ }
+		virtual const std::shared_ptr<Material>& material() const  { 
+			return nullptr; 
+		}
+
 		Color GetColor() const;
 
 	private:

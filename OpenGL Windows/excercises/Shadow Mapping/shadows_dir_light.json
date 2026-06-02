@@ -32,6 +32,11 @@
     "Frag": "Shadow Mapping Shaders/FrameBuffer-Screen-Frag.shader"
   },
 
+  "DepthModelShader": {
+    "Vertex": "Shadow Mapping Shaders/DepthFB-Vertex.shader",
+    "Frag": "Shadow Mapping Shaders/DepthFB-Frag.shader"
+  },
+
   "DebugScreenShader": {
     "Vertex": "Shadow Mapping Shaders/FrameBuffer-Screen-Vertex.shader",
     "Frag": "Shadow Mapping Shaders/Debug-FrameBuffer-Screen-Frag.shader"

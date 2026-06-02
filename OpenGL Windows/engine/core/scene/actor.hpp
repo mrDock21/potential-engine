@@ -20,7 +20,7 @@ namespace CEngine {
 		Actor(const std::string&, Mesh*, Material*);
 
 		void SetMesh(Mesh*);
-		void SetMaterial(Material*);
+		virtual void SetMaterial(const std::shared_ptr<Material>&);
 
 		virtual void Initialize(const UBO& matricesUBO, const UBO& lightsUBO);
 		/// <summary>
@@ -32,6 +32,8 @@ namespace CEngine {
 		///		Renders this object with a specific shader
 		/// </summary>
 		virtual void RenderWith(const Material& usedMaterial);
+
+		virtual const std::shared_ptr<Material>& material() const;
 
 		/// <summary>
 		///		Binds OpenGL object (gives room to set shader properties).
@@ -46,10 +48,9 @@ namespace CEngine {
 		void EndRender();
 
 		Mesh* mesh() const;
-		Material* material() const;
 
 	private:
 		std::unique_ptr<Mesh> meshPtr;
-		std::unique_ptr<Material> materialPtr;
+		std::shared_ptr<Material> materialPtr;
 	};
 }

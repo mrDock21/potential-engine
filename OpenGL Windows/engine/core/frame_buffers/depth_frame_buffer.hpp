@@ -15,7 +15,6 @@ namespace CEngine {
 	public:
 
 		DepthFrameBuffer(const unsigned int&, const unsigned int&);
-		~DepthFrameBuffer();
 
 		void Use() const;
 

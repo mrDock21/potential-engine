@@ -14,7 +14,7 @@ Material::Material(std::shared_ptr<Shader> ptr) : Material() {
  * @param vertexSrc Source code of vertex shader
  * @param fragSrc Source code of fragment shader
 */
-Material::Material(const std::string& vertexSrc, const std::string& fragSrc) {
+Material::Material(const std::string& vertexSrc, const std::string& fragSrc) : Material() {
     // assuming this is the first time the shader is created...
     shader = std::make_shared<Shader>(vertexSrc, fragSrc);
 }

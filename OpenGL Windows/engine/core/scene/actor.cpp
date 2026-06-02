@@ -22,10 +22,9 @@ void Actor::SetMesh(Mesh* m) {
 	meshPtr = std::unique_ptr<Mesh>(m);
 }
 
-void Actor::SetMaterial(Material* m) {
-	// delete the older one
-	materialPtr.reset();
-	materialPtr = std::unique_ptr<Material>(m);
+void Actor::SetMaterial(const std::shared_ptr<Material>& material) {
+	
+	materialPtr = material;
 
 	// rebind VAO with new material
 	meshPtr->Use();
@@ -72,8 +71,8 @@ void Actor::EndRender() {
 	meshPtr->Draw();
 }
 
-Material* Actor::material() const {
-	return materialPtr.get();
+const std::shared_ptr<Material>& Actor::material() const {
+	return materialPtr;
 }
 
 Mesh* Actor::mesh() const {

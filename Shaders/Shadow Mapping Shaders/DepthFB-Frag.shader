@@ -8,5 +8,5 @@ void main() {
 	// The below is automatically done bu OpenGL in the background
 	//	uncommenting this would just do the same thing
 
-	// gl_FragDepth = gl_FragCoord.z;
+	gl_FragDepth = gl_FragCoord.z;
 }
