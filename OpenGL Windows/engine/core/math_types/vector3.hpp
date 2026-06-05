@@ -49,6 +49,7 @@ namespace CEngine {
             static Vector3 Up();
             static Vector3 Right();
             static Vector3 Forward();
+            static Vector3 Zero();
             static float Dot(const Vector3&, const Vector3&);
             static Vector3 Cross(const Vector3&, const Vector3&);
             static Vector3 Normalize(const Vector3&);

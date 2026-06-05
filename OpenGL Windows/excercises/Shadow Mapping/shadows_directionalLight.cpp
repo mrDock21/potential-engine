@@ -46,22 +46,7 @@ public:
     {
         RetrieveSettings(jsonConfig);
 
-        screenFrameBuffer = std::make_unique<FrameBufferQuad>(
-            w, h, std::make_shared<Shader>(settings.ScreenShaderVertex, settings.ScreenShaderFrag)
-        );
-        
-        depthFrameBuffer = std::make_unique<DepthFrameBuffer>(1024, 1024);
-
-        depthFrameBufferShader = std::make_shared<Material>(
-            settings.DepthModelVertexShader, settings.DepthModelFragShader
-        );
-
-        debugScreenFrameBufferShader = std::make_shared<Shader>(
-            settings.DebugScreenShaderVertex, settings.DebugScreenShaderFrag
-        );
-        debugScreenFrameBuffer = std::make_unique<FrameBufferQuad>(
-            w, h, debugScreenFrameBufferShader
-        );
+        InitFrameBuffers();
 
         CreateSkybox();
 
@@ -179,6 +164,7 @@ public:
     virtual void HandleUI() {
         // transform window
         transformWnd.UpdateUI();
+        sunTransformWnd.UpdateUI();
     }
 
     void OnMainLoopInit() {
@@ -194,7 +180,32 @@ public:
         CreateFloorQuad();
 
         // link UI controls to the model
+        transformWnd.WindowName = "Bunny Model";
         transformWnd.Context(mainScene.GetChild(0));
+        sunTransformWnd.WindowName = "Sun Directional Light";
+        sunTransformWnd.Context(sun);
+    }
+
+    void InitFrameBuffers() {
+
+        float w(settings.WindowWidth), h(settings.WindowHeight);
+
+        screenFrameBuffer = std::make_unique<FrameBufferQuad>(
+            w, h, std::make_shared<Shader>(settings.ScreenShaderVertex, settings.ScreenShaderFrag)
+        );
+
+        depthFrameBuffer = std::make_unique<DepthFrameBuffer>(1024, 1024);
+
+        depthFrameBufferShader = std::make_shared<Material>(
+            settings.DepthModelVertexShader, settings.DepthModelFragShader
+        );
+
+        debugScreenFrameBufferShader = std::make_shared<Shader>(
+            settings.DebugScreenShaderVertex, settings.DebugScreenShaderFrag
+        );
+        debugScreenFrameBuffer = std::make_unique<FrameBufferQuad>(
+            w, h, debugScreenFrameBufferShader
+        );
     }
 
     // static version
@@ -229,7 +240,7 @@ public:
         for (Actor* actor : importer.Data()) {
             // to bind with current VAO
             Logger::Log("READS MODEL =>" + actor->Name);
-            actor->Transform().Scale(0.005f);
+            actor->SetScale(0.005f);
             actor->mesh()->Use();
             actor->material()->AddTexture(diffuseTex, "diffuseTexture");
             std::shared_ptr<Actor> a(actor);
@@ -242,11 +253,17 @@ public:
         auto pLight2 = std::make_shared<PointLight>();
         auto pLight3 = std::make_shared<PointLight>();
 
-        pLight->Transform().Position(Vector3(-0.5, 0.5, -0.5));
+        sun = std::make_shared<DirectionalLight>(
+            Color::From255(Vector3(255.0f, 87.0f, 51.0f)),
+            Vector3(1, 1, 1),   // pos
+            Vector3(-35, 25, 0) // rotation
+        );
+
+        pLight->SetPosition(Vector3(-0.5, 0.5, -0.5));
         pLight->SetColor(Color::Blue);
-        pLight2->Transform().Position(Vector3(0.5, -0.5, 0.5));
+        pLight2->SetPosition(Vector3(0.5, -0.5, 0.5));
         pLight2->SetColor(Color::Green);
-        pLight3->Transform().Position(Vector3(-0.5, -0.5, 0.5));
+        pLight3->SetPosition(Vector3(-0.5, -0.5, 0.5));
         pLight3->SetColor(Color::From255(255, 192, 203)); // pink
 
         mainScene.AddPointLight(pLight);
@@ -269,7 +286,7 @@ public:
 
         newMat->AddTexture(windowTex, "Window Texture");
 
-        newQuad->Transform().Position(Vector3(0, 0, -0.5));
+        newQuad->SetPosition(Vector3(0, 0, -0.5));
 
         mainScene.AddActor(newQuad);
 
@@ -287,9 +304,9 @@ public:
 
         newMat->AddTexture(floorTex, "Floor Texture");
 
-        newQuad->Transform().Position(Vector3(0, -0.6f, 0));
-        newQuad->Transform().Rotate(90, Vector3::Right());
-        newQuad->Transform().Scale(3);
+        newQuad->SetPosition(Vector3(0, -0.6f, 0));
+        newQuad->RotateX(90);
+        newQuad->SetScale(3);
 
         mainScene.AddActor(newQuad); 
         
@@ -304,16 +321,13 @@ public:
 
     void RenderDepthBuffer() {
         Matrix4 proj, view;
-        Vector3 sunPos(1.5f, 1.5f, 0.0f), lookPos(0);
+        Vector3 sunPos = sun->GetPosition(), lookPos = sun->Transform().Forward();
         const float nearPlane(0.01), farPlane(7.5f);
-
-        sunPos = mainCamera.Transform().Position();
-        lookPos = sunPos + mainCamera.Transform().Forward();
 
         proj = Matrix4::Ortho(
             -3.0f, 3.0f, -3.0f, 3.0f, nearPlane, farPlane
         );
-        view = Matrix4::LookAt(sunPos, lookPos, Vector3::Up());
+        view = Matrix4::LookAt(sunPos, sunPos + lookPos, Vector3::Up());
 
         mainScene.ForEachObject([this](const std::shared_ptr<Object> &obj) {
             std::shared_ptr<ISceneRenderable> renderable =
@@ -325,18 +339,12 @@ public:
         depthFrameBuffer->Render([this, &proj, &view]() {
 
             mainScene.Render(view, proj, nullptr);
-            
         });
 
-        debugScreenFrameBuffer->UseAsRenderTarget();
+        // DEBUG for showing the depth texture to the screen
         debugScreenFrameBuffer->RenderQuad(false, [this]() {
-            
-            //debugScreenFrameBufferShader->up
             // bind image with texture set 0 + N
-            glActiveTexture(GL_TEXTURE0);
-            depthFrameBuffer->Tex()->Use();
-            // connect the texture set and the uniform in the shader 
-            //debugScreenFrameBufferShader->SetUniform("screenTexture", 0);
+            depthFrameBuffer->UseDepthTextureInShader();
         });
     }
 
@@ -361,6 +369,7 @@ private:
     Scene mainScene;
     Camera mainCamera;
     // needed for shadows
+    std::shared_ptr<DirectionalLight> sun;
     std::unique_ptr<DepthFrameBuffer> depthFrameBuffer;
     std::shared_ptr<Material> depthFrameBufferShader;
     std::shared_ptr<Material> blinnPhongShader;
@@ -373,7 +382,7 @@ private:
     std::unique_ptr<CubeMap> backgroundSkybox;
 
     // ui...
-    UITransform transformWnd;
+    UITransform transformWnd, sunTransformWnd;
 
     // config file settings
     struct Settings {

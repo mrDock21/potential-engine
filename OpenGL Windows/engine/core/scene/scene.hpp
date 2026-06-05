@@ -27,12 +27,11 @@ namespace CEngine {
 		const unsigned long long LIGHTS_ARRAY_SIZE = Vector4::Size() * 2 * MAX_LIGHTS,
 								 SUN_STRUCT_SIZE = Vector4::Size() * 3;
 
-		DirectionalLight Sun;
-
 		Scene();
 		Scene(const DirectionalLight&);
 		~Scene();
 
+		void Sun(const DirectionalLight&);
 		void AddPointLight(std::shared_ptr<PointLight>);
 		void AddActor(std::shared_ptr<Actor>);
 		void AddObject(std::shared_ptr<Object>);
@@ -54,7 +53,7 @@ namespace CEngine {
 
 		void ForEachObject(std::function<void(const std::shared_ptr<Object>&)>);
 
-		std::shared_ptr<Object> GetChild(const int&);
+		const std::shared_ptr<Object>& GetChild(const int&);
 
 	private:
 
@@ -69,6 +68,7 @@ namespace CEngine {
 		uint innerCount, lightCount;
 		std::vector<SceneObject> opaqueActors, transparentActors;
 
+		DirectionalLight sun;
 		std::shared_ptr<Light> lights[10];
 
 		UBO globalMatricesBuffer, globalLightsBuffer;

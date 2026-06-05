@@ -35,6 +35,67 @@ Object::Object(
 	transform.Scale(scale);
 }
 
-CEngine::Transform& Object::Transform() {
+const CEngine::Transform& Object::Transform() {
 	return transform;
+}
+
+void Object::SetPosition(const Vector3& pos) {
+	transform.Position(pos);
+}
+
+void Object::MovePosition(const Vector3& dir) {
+	transform.Position(
+		transform.Position() + dir
+	);
+}
+
+void Object::SetRotation(const Vector3& eulers) {
+	transform.EulerAngles(eulers);
+}
+
+
+void Object::SetRotation(const Quaternion& rot) {
+	transform.Rotation(rot);
+}
+
+void Object::RotateX(const float& angle) {
+	transform.Rotate(angle, transform.Right());
+}
+
+void Object::RotateY(const float& angle) {
+	transform.Rotate(angle, transform.Up());
+}
+
+void Object::RotateZ(const float& angle) {
+	transform.Rotate(angle, transform.Forward());
+}
+
+void Object::RotateAxis(const float& angle, const Vector3& axis) {
+	transform.Rotate(angle, axis);
+}
+
+void Object::Rotate(const Quaternion& rot) {
+	transform.Rotate(rot);
+}
+
+
+void Object::SetScale(const float& uniformScale) {
+	transform.Scale(uniformScale);
+}
+
+
+void Object::SetScale(const Vector3& scaleXYZ) {
+	transform.Scale(scaleXYZ);
+}
+
+void Object::SetForward(const Vector3& dir) {
+	transform.Forward(dir);
+}
+
+Vector3 Object::GetPosition() const {
+	return transform.Position();
+}
+
+Vector3 Object::GetRotation() const {
+	return transform.EulerAngles();
 }

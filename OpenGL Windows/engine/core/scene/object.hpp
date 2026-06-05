@@ -22,7 +22,24 @@ namespace CEngine {
 		Object(const std::string&, const Vector3&, const Vector3&);
 		Object(const std::string&, const Vector3&, const Vector3&, const Vector3&);
 
-		CEngine::Transform& Transform();
+		const CEngine::Transform& Transform();
+
+		void SetPosition(const Vector3&);
+		void MovePosition(const Vector3&);
+		void SetRotation(const Vector3&);
+		void SetRotation(const Quaternion&);
+		void RotateX(const float&);
+		void RotateY(const float&);
+		void RotateZ(const float&);
+		void RotateAxis(const float&, const Vector3&);
+		void Rotate(const Quaternion&);
+		void SetScale(const float&);
+		void SetScale(const Vector3&);
+
+		void SetForward(const Vector3&);
+
+		Vector3 GetPosition() const;
+		Vector3 GetRotation() const;
 
 	private:
 		CEngine::Transform transform;

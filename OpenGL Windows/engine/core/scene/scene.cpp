@@ -2,16 +2,12 @@
 
 using namespace CEngine;
 
-Scene::Scene() : innerCount(0), lightCount(0) {
-	Color c;
-	c.Set255(Vector3(255.0f, 87.0f, 51.0f));
-	Sun.SetColor(c);
-	Sun.Dir(Vector3(-1, -1, -1));
+Scene::Scene() : innerCount(0), lightCount(0), sun() {
+
 }
 
 Scene::Scene(const DirectionalLight& otherSun) : Scene() {
-	Sun.SetColor(otherSun.GetColor());
-	Sun.Dir(otherSun.Dir());
+	sun = otherSun;
 }
 
 Scene::~Scene() {
@@ -19,6 +15,11 @@ Scene::~Scene() {
 	opaqueActors.clear();
 	transparentActors.clear();
 }
+
+void Scene::Sun(const DirectionalLight& _sun) {
+	sun = _sun;
+}
+
 
 void Scene::AddPointLight(std::shared_ptr<PointLight> plight) {
 
@@ -148,7 +149,7 @@ void Scene::ForEachObject(std::function<void(const std::shared_ptr<Object>&)> la
 	}
 }
 
-std::shared_ptr<Object> Scene::GetChild(const int& i) {
+const std::shared_ptr<Object>& Scene::GetChild(const int& i) {
 
 	for (int j(0); j < opaqueActors.size(); j++) {
 
@@ -185,13 +186,13 @@ void Scene::UpdateSun() {
 	// since the array is allocated in memory already, we skip the whole thing...
 	float offset = LIGHTS_ARRAY_SIZE;
 	//	upload dir
-	globalLightsBuffer.Upload(Vector4(Sun.Dir(), 0.0f), offset);
+	globalLightsBuffer.Upload(Vector4(sun.Dir(), 0.0f), offset);
 	offset += Vector4::Size();
 	//	upload color
-	globalLightsBuffer.Upload(Sun.GetColor().RGBA(), offset);
+	globalLightsBuffer.Upload(sun.GetColor().RGBA(), offset);
 	offset += Vector4::Size();
 	//	upload ambient color
-	globalLightsBuffer.Upload(Sun.GetColor().RGBA() * 0.1f, offset);
+	globalLightsBuffer.Upload(sun.GetColor().RGBA() * 0.1f, offset);
 	offset += Vector4::Size();
 	// update current count
 	globalLightsBuffer.Upload((float)lightCount, offset);

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 #include "imgui/imgui.h"
 
@@ -14,9 +15,9 @@ namespace CEngine {
 
 		virtual void UpdateUI() = 0;
 		virtual void Reset() = 0;
-		virtual void OnContextChanged(std::shared_ptr<Object>) = 0;
+		virtual void OnContextChanged(const std::shared_ptr<Object>&) = 0;
 
-		void Context(std::shared_ptr<Object> contextPtr) {
+		void Context(const std::shared_ptr<Object>& contextPtr) {
 			
 			context = contextPtr;
 
@@ -28,13 +29,16 @@ namespace CEngine {
 			OnContextChanged(context);
 		}
 
-		std::shared_ptr<Object> Context() {
+		const std::shared_ptr<Object>& Context() {
 			return context;
 		}
 
 		bool HasContext() { 
 			return context != nullptr; 
 		}
+
+		std::string WindowName;
+
 	private:
 		std::shared_ptr<Object> context;
 	};

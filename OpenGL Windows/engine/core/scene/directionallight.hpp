@@ -9,12 +9,13 @@ namespace CEngine {
 	public:
 		using Light::Light;
 
-		DirectionalLight(const Vector3&, const Vector3&);
 		DirectionalLight();
+		DirectionalLight(const Vector3&, const Vector3&);
+		DirectionalLight(const Color&, const Vector3&, const Vector3&);
 
-		void Dir(const Vector3&);
+		Vector3 Dir();
 
-		Vector3 Dir() const;
+		const DirectionalLight& operator = (const DirectionalLight&);
 
 	private:
 		Vector3 dir;

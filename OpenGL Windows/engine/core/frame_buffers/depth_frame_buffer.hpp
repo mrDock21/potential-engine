@@ -17,10 +17,12 @@ namespace CEngine {
 		DepthFrameBuffer(const unsigned int&, const unsigned int&);
 
 		void Use() const;
+		void UseDepthTextureInShader() const;
+		void UseDepthTextureInShader(const int&) const;
 
 		void Render(std::function<void()>) const;
 
-		std::shared_ptr<DepthTexture> Tex() const;
+		const std::shared_ptr<DepthTexture>& Tex() const;
 
 	private:
 		std::shared_ptr<FrameBuffer> frameBufferPtr;

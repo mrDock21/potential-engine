@@ -88,6 +88,10 @@ Vector3 Vector3::Forward(){
     return Vector3(0.0f, 0.0f, 1.0f);
 }
 
+Vector3 Vector3::Zero() {
+    return Vector3(0, 0, 0);
+}
+
 float Vector3::Dot(const Vector3& l, const Vector3& r) {
     return glm::dot(l.vec, r.vec);
 }

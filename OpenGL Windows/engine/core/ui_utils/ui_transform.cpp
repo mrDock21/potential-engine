@@ -2,15 +2,16 @@
 
 using namespace CEngine;
 
-UITransform::UITransform() {
-	Context(nullptr);
+UITransform::UITransform() : pos(), rot(), scale() {
+
 }
 
 void UITransform::UpdateUI() {
 	bool hasContext = HasContext();
-	
+	auto obj = Context();
+
 	// Create a window called "Imported objects" and append into it.
-	ImGui::Begin("Transform");
+	ImGui::Begin( ("Transform: " + WindowName).c_str() );
 	ImGui::DragFloat3("Position: ", pos.data());
 	ImGui::DragFloat3("Rotation: ", rot.data());
 	ImGui::DragFloat3("Scale:    ", scale.data());
@@ -22,9 +23,9 @@ void UITransform::UpdateUI() {
 
 	if (hasContext) {
 		// update the element...
-		transform->Position(Vector3(pos[0], pos[1], pos[2]));
-		transform->EulerAngles(Vector3(rot[0], rot[1], rot[2]));
-		transform->Scale(Vector3(scale[0], scale[1], scale[2]));
+		obj->SetPosition(Vector3(pos[0], pos[1], pos[2]));
+		obj->SetRotation(Vector3(rot[0], rot[1], rot[2]));
+		obj->SetScale(Vector3(scale[0], scale[1], scale[2]));
 	}
 }
 
@@ -33,17 +34,15 @@ void UITransform::Reset() {
 	scale = { 1, 1, 1 };
 }
 
-void UITransform::OnContextChanged(std::shared_ptr<Object> newContext) {
+void UITransform::OnContextChanged(const std::shared_ptr<Object>& newContext) {
 	Vector3 v;
-
-	transform = &newContext->Transform();
 	
-	v = transform->Position();
+	v = newContext->Transform().Position();
 	pos = { v.X(), v.Y(), v.Z() };
 
-	v = transform->EulerAngles();
+	v = newContext->Transform().EulerAngles();
 	rot = { v.X(), v.Y(), v.Z() };
 	
-	v = transform->Scale();
+	v = newContext->Transform().Scale();
 	scale = { v.X(), v.Y(), v.Z() };
 }

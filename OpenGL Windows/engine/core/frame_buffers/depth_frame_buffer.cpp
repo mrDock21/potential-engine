@@ -32,10 +32,14 @@ void DepthFrameBuffer::Use() const {
 	depthTexturePtr->Use();
 }
 
+/// <summary>
+///		Prepares this FrameBuffer to receive data while rendering the scene.
+///		The scene rendered MUST be passed in the lambda
+/// </summary>
 void DepthFrameBuffer::Render(std::function<void()> sceneRenderFunc) const {
 	int viewportData[4];
 
-	// save previous size
+	// get previous screen size data (fills the array)
 	glGetIntegerv(GL_VIEWPORT, viewportData);
 
 	// and adjust to this framebuffer
@@ -57,7 +61,24 @@ void DepthFrameBuffer::Render(std::function<void()> sceneRenderFunc) const {
 	glViewport(0, 0, viewportData[2], viewportData[3]);
 }
 
-std::shared_ptr<DepthTexture> DepthFrameBuffer::Tex() const {
+/// <summary>
+///		Will bind the depth texture for shader use in slot 0
+/// </summary>
+void DepthFrameBuffer::UseDepthTextureInShader() const {
+	UseDepthTextureInShader(0);
+}
+
+/// <summary>
+///		Will bind the depth texture for shader use in a specific slot index
+/// </summary>
+void DepthFrameBuffer::UseDepthTextureInShader(const int& index) const {
+	// bind image with to texture (sampler2D) set 0 + N
+	glActiveTexture(GL_TEXTURE0 + index);
+	depthTexturePtr->Use();
+
+}
+
+const std::shared_ptr<DepthTexture>& DepthFrameBuffer::Tex() const {
 	return depthTexturePtr;
 }
 

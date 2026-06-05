@@ -3,20 +3,36 @@
 using namespace CEngine;
 
 DirectionalLight::DirectionalLight() {
+	SetColor( Color::White );
+	SetPosition( Vector3::Zero() );
+	SetRotation( Vector3::Zero() );
 
 }
 
-DirectionalLight::DirectionalLight(const Vector3& pos, const Vector3& dir) {
+DirectionalLight::DirectionalLight(const Vector3& pos, const Vector3& eulers) {
+
+	SetColor( Color::White );
+	SetPosition( pos );
+	SetRotation( eulers );
+}
+
+DirectionalLight::DirectionalLight(const Color& color, const Vector3& pos, const Vector3& eulers)
+	: DirectionalLight(pos, eulers) {
+
+	SetColor(color);
+}
+
+Vector3 DirectionalLight::Dir() {
+	return Transform().Forward();
+}
+
+const DirectionalLight& DirectionalLight::operator = (const DirectionalLight& dl) {
 	
-	Transform().Position(pos);
-	Dir(dir);
-}
 
-void DirectionalLight::Dir(const Vector3& v) {
-	dir = v;
-}
+	SetPosition( dl.GetPosition() );
 
-Vector3 DirectionalLight::Dir() const
-{
-	return dir;
+	dir = dl.dir;
+	color = dl.color;
+
+	return *this;
 }

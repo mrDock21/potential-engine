@@ -12,10 +12,9 @@ namespace CEngine {
 		UITransform();
 		virtual void UpdateUI();
 		virtual void Reset();
-		virtual void OnContextChanged(std::shared_ptr<Object>);
+		virtual void OnContextChanged(const std::shared_ptr<Object>&);
 
 	private:
 		std::vector<float> pos, rot, scale;
-		Transform *transform;
 	};
 }

@@ -29,7 +29,7 @@ namespace CEngine {
 
 		Color GetColor() const;
 
-	private:
+	protected:
 		Color color;
 	};
 }

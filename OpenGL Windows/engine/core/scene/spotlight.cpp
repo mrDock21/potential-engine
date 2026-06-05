@@ -11,7 +11,7 @@ SpotLight::SpotLight(const float& angle) : spotAngle(angle) {
 }
 
 void SpotLight::Forward(const Vector3& dir) {
-	Transform().Forward(dir);
+	SetForward(dir);
 }
 
 void SpotLight::SpotAngle(const float& angle) {
