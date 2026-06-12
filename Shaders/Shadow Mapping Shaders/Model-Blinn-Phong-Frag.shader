@@ -41,6 +41,7 @@ layout(std140) uniform GlobalLights {
 vec3 computeDirectionalLight(vec3 normal, vec3 viewDir);
 vec3 computePointLight(vec3 normal, PointLight pLight, vec3 viewDir, vec3 fragPos);
 float computeShadow(vec3 _normal, vec3 lightDir);
+float computeShadowPCF(vec3 projCoords, float currentDepth, float bias);
 
 /**
 * This shader is meant to be used by the 3D objects, NOT the light itself
@@ -131,12 +132,30 @@ float computeShadow(vec3 _normal, vec3 lightDir) {
 	projCoords = (projCoords2 * 0.5) + 0.5;
 
 	// retrieve depth values
-	float closestDepth = texture(depthTexture, projCoords.xy).r,
-		  currentDepth = projCoords.z;
+	float currentDepth = projCoords.z;
 
 	float bias = max(0.05 * (1.0 - dot(_normal, lightDir)), 0.005),
 		  // the bigger the z component is: the closer it is to the camera
-		  shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
+		  shadow = computeShadowPCF(projCoords, currentDepth, bias);
 	
+	// if outside the projection's' "far" plane: ignore the shadows altogether
+	shadow = (projCoords.z > 1.0) ? 0.0 : shadow;
+
 	return shadow;
+}
+
+float computeShadowPCF(vec3 projCoords, float currentDepth, float bias) {
+
+	float shadow = 0.0, pcfDepth;
+	vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
+
+	for (int i = -1; i <= 1 ; ++i) {
+		for (int j = -1; j <= 1 ; ++j) {
+			// retrieve depth values using the texel size
+			pcfDepth = texture(depthTexture, projCoords.xy + vec2(i, j) * texelSize).r;
+			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+	// average the depth values to get a blurred shadow
+	return shadow / 9.0;
 }
