@@ -20,7 +20,7 @@ namespace CEngine {
 
 		virtual void Render(){ /* Not used for now */ }
 
-		virtual void RenderWith(const Material& _) { /* Not used for now */ }
+		virtual void RenderWith(const std::shared_ptr<Material>& _) { /* Not used for now */ }
 
 		virtual void SetMaterial(const std::shared_ptr<Material>& m){ /* Not used for now */ }
 		virtual const std::shared_ptr<Material>& material() const  { 

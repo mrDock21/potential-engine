@@ -31,7 +31,7 @@ namespace CEngine {
 		/// <summary>
 		///		Renders this object with a specific shader
 		/// </summary>
-		virtual void RenderWith(const Material& usedMaterial);
+		virtual void RenderWith(const std::shared_ptr<Material>&);
 
 		virtual const std::shared_ptr<Material>& material() const;
 

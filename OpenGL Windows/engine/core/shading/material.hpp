@@ -5,7 +5,9 @@
 #include <memory>
 
 #include "shading/Shader.hpp"
+#include "shading/itexture.hpp"
 #include "shading/Texture.hpp"
+#include "shading/depth_texture.hpp"
 
 #include "material_property_types.hpp"
 
@@ -34,7 +36,9 @@ namespace CEngine {
         void SetUniformBlock(const UBO&);
         void SetCullingMode(CullingMode);
 
-        void AddTexture(std::shared_ptr<Texture>, const std::string&);
+        void AddTexture(const std::shared_ptr<Texture>&, const std::string&);
+        void AddTexture(const std::shared_ptr<DepthTexture>&, const std::string&);
+        void AddTexture(const std::shared_ptr<ITexture>&, const std::string&);
         void SetUniform(const std::string&, const int&);
         void SetUniform(const std::string&, const float&);
         void SetUniform(const std::string&, const Vector3&);
@@ -52,7 +56,7 @@ namespace CEngine {
         // a material may share the shader with another
         std::shared_ptr<Shader> shader;         
         // each may have different textures...
-        std::vector< std::shared_ptr<Texture> > textures; 
+        std::vector< std::shared_ptr<ITexture> > textures; 
 
         CullingMode cullMode;
 

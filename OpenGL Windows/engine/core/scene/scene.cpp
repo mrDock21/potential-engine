@@ -17,7 +17,9 @@ Scene::~Scene() {
 }
 
 void Scene::Sun(const DirectionalLight& _sun) {
-	sun = _sun;
+	sun.SetRotation(_sun.GetRotation());
+	sun.SetPosition(_sun.GetPosition());
+	sun.SetColor(_sun.GetColor());
 }
 
 
@@ -72,7 +74,7 @@ void Scene::InitializeGlobalData() {
 		GMATRICES_UBO_NAME,		// same as shader...
 		GMATRICES_UBO_INDEX,	//	for global matrices = 0
 		0,						
-		Matrix4::Size() * 2		// since there are two matrices (view, proj)
+		GLOBAL_MATRICES_SIZE	// there are 4 matrices (view, proj, lightView, lightProj)
 	);
 
 	globalLightsBuffer = UBO(
@@ -92,13 +94,7 @@ void Scene::Render(const Matrix4& view, const Matrix4& proj) {
 
 void Scene::Render(const Matrix4& view, const Matrix4& proj, CubeMap* const sky) {
 
-	// update View matrix
-	// since it's the first, we set offset to 0
-	globalMatricesBuffer.Upload(view, 0);
-
-	// update (perspective) Projection matrix
-	// since the 'view' matrix is before this one, the offset is different
-	globalMatricesBuffer.Upload(proj, Matrix4::Size());
+	UpdateGlobalMatrices(view, proj);
 
 	// update the rest of lights
 	UpdateLights();
@@ -112,28 +108,22 @@ void Scene::Render(const Matrix4& view, const Matrix4& proj, CubeMap* const sky)
 	if (sky != nullptr)
 		sky->Render(view, proj);
 
-	// Opaque rendering 
+	// transparent rendering 
 	for (auto actor : transparentActors) {
 		actor.Obj->Render();
 	}
 }
 
-void Scene::RenderDepth(const Matrix4& view, const Matrix4& proj, const Material& depthShader) {
+void Scene::RenderWithShader(const Matrix4& view, const Matrix4& proj, const std::shared_ptr <Material>& depthShader) {
 	
-	// update View matrix => Should from the lights/camera/object perspective
-	// since it's the first, we set offset to 0
-	globalMatricesBuffer.Upload(view, 0);
-
-	// update Projection matrix => Should from the lights/object perspective/orthographic
-	// since the 'view' matrix is before this one, the offset is different
-	globalMatricesBuffer.Upload(proj, Matrix4::Size());
+	UpdateGlobalMatrices(view, proj);
 
 	// Opaque rendering 
 	for (auto actor : opaqueActors) {
 		actor.Obj->RenderWith(depthShader);
 	}
 
-	// Opaque rendering 
+	// transparent rendering 
 	for (auto actor : transparentActors) {
 		actor.Obj->RenderWith(depthShader);
 	}
@@ -166,6 +156,27 @@ const std::shared_ptr<Object>& Scene::GetChild(const int& i) {
 	return nullptr;
 }
 
+void Scene::UpdateGlobalMatrices(const Matrix4& view, const Matrix4& proj) {
+	// update View matrix => Should from the lights/camera/object perspective
+	// since it's the first, we set offset to 0
+	globalMatricesBuffer.Upload(view, 0);
+
+	// update Projection matrix => Should from the lights/object perspective/orthographic
+	// since the 'view' matrix is before this one, the offset is different
+	globalMatricesBuffer.Upload(proj, Matrix4::Size());
+
+	// update the Sun's light space matrix 
+	// since the 'view' and 'proj' matrices are before this one, the offset is different
+	globalMatricesBuffer.Upload(
+		Matrix4::LookAt(sun.GetPosition(), sun.GetPosition() + sun.Transform().Forward(), Vector3::Up()),
+		Matrix4::Size() * 2
+	);
+	globalMatricesBuffer.Upload(
+		Matrix4::Ortho(-3.0f, 3.0f, -3.0f, 3.0f, 0.01f, 7.5f),
+		Matrix4::Size() * 3
+	);
+}
+
 void Scene::UpdateLights() {
 	
 	float offset(0);
@@ -186,7 +197,7 @@ void Scene::UpdateSun() {
 	// since the array is allocated in memory already, we skip the whole thing...
 	float offset = LIGHTS_ARRAY_SIZE;
 	//	upload dir
-	globalLightsBuffer.Upload(Vector4(sun.Dir(), 0.0f), offset);
+	globalLightsBuffer.Upload(Vector4(sun.Transform().Forward(), 0.0f), offset);
 	offset += Vector4::Size();
 	//	upload color
 	globalLightsBuffer.Upload(sun.GetColor().RGBA(), offset);

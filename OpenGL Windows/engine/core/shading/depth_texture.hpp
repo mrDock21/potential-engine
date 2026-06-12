@@ -4,9 +4,11 @@
 
 #include "types/types.hpp"
 
+#include "shading/itexture.hpp"
+
 namespace CEngine {
 	
-	class DepthTexture {
+	class DepthTexture : public ITexture {
 
 		// to be able to access the ID
 		friend class DepthFrameBuffer;
@@ -16,7 +18,7 @@ namespace CEngine {
 		DepthTexture(const unsigned int&, const unsigned int&);
 		~DepthTexture();
 
-		void Use() const;
+		virtual void Use() const;
 		void Unbind() const;
 
 	private:

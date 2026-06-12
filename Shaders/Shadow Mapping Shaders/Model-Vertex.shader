@@ -9,6 +9,8 @@ out vec2 texCoord;
 out vec3 normal;
 out vec4 fragPos;
 out mat4 viewMatrix;
+out vec4 lightFragPos;
+out mat4 lightProjMatrix;
 
 uniform mat4 model;
 
@@ -17,6 +19,9 @@ uniform mat4 model;
 layout(std140) uniform GlobalMatrices {
 	mat4 view;
 	mat4 projection;
+	mat4 sunLightSpaceMatrix;
+	mat4 sunLightProjMatrix;
+	// make sure the byte size is updated in the ubo code
 };
 
 void main() {
@@ -25,6 +30,9 @@ void main() {
 	normal = (view * model * vec4(aNormal, 0.0)).xyz;
 	fragPos = view * model * vec4(aPos.xyz, 1.0);
 	viewMatrix = view;
+
+	lightFragPos = sunLightSpaceMatrix * model * vec4(aPos.xyz, 1.0);
+	lightProjMatrix = sunLightProjMatrix;
 
 	gl_Position = projection * view * model * vec4(aPos.xyz, 1.0);
 }

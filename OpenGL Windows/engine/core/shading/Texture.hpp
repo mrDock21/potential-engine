@@ -4,12 +4,14 @@
 
 #include "types/types.hpp"
 
+#include "shading/itexture.hpp"
+
 #include "stb_img_loader.hpp"
 
 namespace CEngine {
 
 
-    class Texture {
+    class Texture : public ITexture {
         public:
             enum class TexFormat { R, RG, RGB, RGBA, sRGB, sRGBA };
             enum class PixelFormat { 
@@ -32,7 +34,7 @@ namespace CEngine {
 
             ~Texture();
 
-            void Use() const;
+            virtual void Use() const;
 
             friend class FrameBuffer;
 

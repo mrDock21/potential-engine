@@ -22,6 +22,7 @@
 
 #include "model_import/model_importer.hpp"
 #include "ui_utils/ui_transform.hpp"
+#include "ui_utils/ui_boolean_value.hpp"
 
 #include "../primitives/Quad.hpp"
 
@@ -42,7 +43,7 @@ using json = nlohmann::json;
 class ShadowsDirectionalLights : public Window {
 public:
     ShadowsDirectionalLights(const std::string& wnd, const int& w, const int h, const json& jsonConfig)
-        : Window(wnd, w, h), mainCamera(), mainScene()
+        : Window(wnd, w, h), mainCamera(), mainScene(), showBothRenders(false)
     {
         RetrieveSettings(jsonConfig);
 
@@ -161,29 +162,29 @@ public:
         UpdateMouseLook();
     }
 
-    virtual void HandleUI() {
-        // transform window
-        transformWnd.UpdateUI();
-        sunTransformWnd.UpdateUI();
-    }
-
     void OnMainLoopInit() {
         // enable ZTest buffering!
         Enable(WndBuffer::Depth);
-
+        
         ImportModel();
-
-        CreateLights();
 
         CreateWindowQuad();
 
         CreateFloorQuad();
+
+        CreateLights();
+
+        InitShadows();
 
         // link UI controls to the model
         transformWnd.WindowName = "Bunny Model";
         transformWnd.Context(mainScene.GetChild(0));
         sunTransformWnd.WindowName = "Sun Directional Light";
         sunTransformWnd.Context(sun);
+        switchToDepthWnd.WindowName = "Display Both Renders?";
+        switchToDepthWnd.Attach("Switch", [this]() {
+            showBothRenders = !showBothRenders;
+        });
     }
 
     void InitFrameBuffers() {
@@ -207,8 +208,7 @@ public:
             w, h, debugScreenFrameBufferShader
         );
     }
-
-    // static version
+    
     void CreateSkybox() {
 
         std::shared_ptr<Material> skyMat;
@@ -305,7 +305,7 @@ public:
         newMat->AddTexture(floorTex, "Floor Texture");
 
         newQuad->SetPosition(Vector3(0, -0.6f, 0));
-        newQuad->RotateX(90);
+        newQuad->RotateX(-90.0f);
         newQuad->SetScale(3);
 
         mainScene.AddActor(newQuad); 
@@ -313,10 +313,12 @@ public:
         blinnPhongShader = newMat;
     }
 
-    void OnRender() {
+    void InitShadows() {
+
+        mainScene.ForEachObject([this](const std::shared_ptr<Object>& obj) {
         
-        RenderDepthBuffer();
-        //RenderSceneNormally();
+            obj->material()->AddTexture(depthFrameBuffer->Tex(), "depthTexture");
+        });
     }
 
     void RenderDepthBuffer() {
@@ -329,16 +331,9 @@ public:
         );
         view = Matrix4::LookAt(sunPos, sunPos + lookPos, Vector3::Up());
 
-        mainScene.ForEachObject([this](const std::shared_ptr<Object> &obj) {
-            std::shared_ptr<ISceneRenderable> renderable =
-                std::static_pointer_cast<ISceneRenderable>(obj);
-
-            renderable->SetMaterial(depthFrameBufferShader);
-        });
-
         depthFrameBuffer->Render([this, &proj, &view]() {
 
-            mainScene.Render(view, proj, nullptr);
+            mainScene.RenderWithShader(view, proj, depthFrameBufferShader);
         });
 
         // DEBUG for showing the depth texture to the screen
@@ -365,6 +360,22 @@ public:
         screenFrameBuffer->RenderQuad();
     }
 
+    virtual void HandleUI() {
+        // transform window
+        transformWnd.UpdateUI();
+        sunTransformWnd.UpdateUI();
+        switchToDepthWnd.UpdateUI();
+    }
+
+    void OnRender() {
+        
+        mainScene.Sun(*sun);
+
+        RenderDepthBuffer();
+        if (showBothRenders)
+            RenderSceneNormally();
+    }
+
 private:
     Scene mainScene;
     Camera mainCamera;
@@ -383,6 +394,8 @@ private:
 
     // ui...
     UITransform transformWnd, sunTransformWnd;
+    UIBooleanValue switchToDepthWnd;
+    bool showBothRenders;
 
     // config file settings
     struct Settings {

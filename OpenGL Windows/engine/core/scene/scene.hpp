@@ -25,7 +25,8 @@ namespace CEngine {
 						  GLIGHTS_UBO_NAME = "GlobalLights";
 
 		const unsigned long long LIGHTS_ARRAY_SIZE = Vector4::Size() * 2 * MAX_LIGHTS,
-								 SUN_STRUCT_SIZE = Vector4::Size() * 3;
+								 SUN_STRUCT_SIZE = Vector4::Size() * 3,
+								 GLOBAL_MATRICES_SIZE = Matrix4::Size() * 4;
 
 		Scene();
 		Scene(const DirectionalLight&);
@@ -48,15 +49,17 @@ namespace CEngine {
 		/// <param name="">	Window's aspect ratio	</param>
 		void Render(const Matrix4&, const Matrix4&);
 		void Render(const Matrix4&, const Matrix4&, CubeMap* const);
-
-		void RenderDepth(const Matrix4&, const Matrix4&, const Material&);
+		/// <summary>
+		///		Will render the whole scene. All the objects will be drawn with the specified shader
+		/// </summary>
+		void RenderWithShader(const Matrix4&, const Matrix4&, const std::shared_ptr <Material>&);
 
 		void ForEachObject(std::function<void(const std::shared_ptr<Object>&)>);
 
 		const std::shared_ptr<Object>& GetChild(const int&);
 
 	private:
-
+		void UpdateGlobalMatrices(const Matrix4&, const Matrix4&);
 		void UpdateLights();
 		void UpdateSun();
 

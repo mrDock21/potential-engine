@@ -47,7 +47,21 @@ void Material::SetCullingMode(Material::CullingMode cm) {
     cullMode = cm;
 }
 
-void Material::AddTexture(std::shared_ptr<Texture> tex, const std::string& textureNameInShader) {
+void Material::AddTexture(const std::shared_ptr<Texture>& tex, const std::string& textureNameInShader) {
+    std::shared_ptr<ITexture> iTex =
+        std::static_pointer_cast<ITexture>(tex);
+
+    AddTexture(iTex, textureNameInShader);
+}
+
+void Material::AddTexture(const std::shared_ptr<DepthTexture>& dTex, const std::string& textureNameInShader) {
+    std::shared_ptr<ITexture> iTex =
+        std::static_pointer_cast<ITexture>(dTex);
+    
+    AddTexture(iTex, textureNameInShader);
+}
+
+void Material::AddTexture(const std::shared_ptr<ITexture>& tex, const std::string& texNameInShader) {
     int textureIndex = textures.size();
     // to bind with current VAO and material
     Use();
@@ -55,7 +69,7 @@ void Material::AddTexture(std::shared_ptr<Texture> tex, const std::string& textu
     glActiveTexture(GL_TEXTURE0 + textureIndex);
     tex->Use();
     // connect the texture set and the uniform in the shader 
-    SetUniform(textureNameInShader, textureIndex);
+    SetUniform(texNameInShader, textureIndex);
     textures.push_back(tex);
 }
 

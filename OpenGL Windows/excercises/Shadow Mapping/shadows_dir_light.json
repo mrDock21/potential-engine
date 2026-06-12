@@ -2,8 +2,8 @@
   "Exercise": "Shadow Mapping with Directional Light",
 
   "Window": {
-    "Width": 800,
-    "Height": 600,
+    "Width": 1024,
+    "Height": 1024,
     "Name": "LearnOpenGL => Shadow Mapping with Directional Light"
   },
 
